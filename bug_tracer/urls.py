@@ -16,7 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from bug_app.views import userAccount_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
+
+    # 用户账户
+    path('user/reg/', userAccount_views.user_register_view, name='user_register_view'),
+    path('user/login/', userAccount_views.user_login_view, name='user_login'),
+    path('send/sms/', userAccount_views.send_sms_view, name='sms_code')
+    # path('user/logout/', userAccount_views)
+
 ]

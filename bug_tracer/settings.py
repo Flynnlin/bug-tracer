@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "bug_app.apps.BugAppConfig"
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,25 @@ DATABASES = {
     }
 }
 
+# 导入 Redis 缓存模块
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS":{
+                "max_connections":1000,
+                "encoding": "utf-8"
+            },
+            "PASSWORD": "tracer"
+        }
+    }
+}
+# # 导入 Redis Session 模块
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_CACHE_ALIAS = "default"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -123,7 +143,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SMS=0
+# SMS=1
+AccessKey_ID = '1'
+AccessKey_Secret=''
+Templatemode={
+    'sms_code':'',
+}
 
 try:
     from .local_settings import *
