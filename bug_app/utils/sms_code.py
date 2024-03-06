@@ -1,4 +1,3 @@
-import json
 
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
@@ -6,15 +5,20 @@ from django.conf import settings
 import random
 
 def send_sms(code,number):
+    """"
+    阿里云发送短信
+
+    """
+
+
+    # 配置接口密钥和模板编号
+    accessKeyId=settings.ACCESSKEY_ID
+    accessKeySecret = settings.ACCESSKEY_SECRET
+    TemplateCode =settings.TEMPLATEMODE['sms_code']
+
     template = {
         'code': code
     }
-    accessKeyId=settings.AccessKey_ID
-    accessKeySecret = settings.AccessKey_Secret
-    TemplateCode =settings.Templatemode['sms_code']
-
-
-
     client = AcsClient(accessKeyId, accessKeySecret, 'default')
     request = CommonRequest()
     request.set_accept_format('json')
@@ -38,6 +42,10 @@ def send_sms(code,number):
         return True
     else:
         return res
+
+    # print('SMS testOK'+code)
+    # return True
+
 
 def generate_sms_code():
     return ''.join(random.choices('0123456789', k=4))

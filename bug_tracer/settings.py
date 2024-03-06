@@ -143,13 +143,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SMS=1
-AccessKey_ID = '1'
-AccessKey_Secret=''
-Templatemode={
+# SMS=1 短信接口信息
+ACCESSKEY_ID = '1'
+ACCESSKEY_SECRET=''
+TEMPLATEMODE={
     'sms_code':'',
 }
 
+
+# 导入本地配置信息 同目录下local_settings.py
 try:
     from .local_settings import *
 except ImportError:
