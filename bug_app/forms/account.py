@@ -85,7 +85,10 @@ class UserRegForm(BootstrapModelForm):
     def clean_captcha(self):
         code = self.cleaned_data['captcha']
         conn = get_redis_connection('default')
-        mobile_phone = self.cleaned_data['mobile_phone']
+        mobile_phone = self.cleaned_data.get('mobile_phone')
+        if not mobile_phone:
+            return code
+
         print(mobile_phone)
         redis_code = conn.get('reg_code'+mobile_phone)
         if not redis_code:
