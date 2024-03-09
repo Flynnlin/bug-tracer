@@ -14,7 +14,7 @@
                     <div class="row"> <!-- 新增的行 -->
                         {% for f in form %}
                             <div class="col-6 mb-3"> <!-- 将每个输入框的宽度调整为 col-4 -->
-                                {% if f.label == "手机验证码" %}
+                                {% if f.name == 'captcha'   %}
                                     {# 如果是验证码字段 需要后面加一共字段                                   #}
                                     <label class="form-label">{{ f.label }}:</label>
                                     <div class="input-group">
@@ -30,7 +30,7 @@
                         {% endfor %}
                     </div>
                     <div class="text-lg-end">
-                        <button id="regsterBtn" type="button" class="btn btn-primary" >提交</button>
+                        <button id="registerBtn" type="button" class="btn btn-primary" >提交</button>
                     </div>
                 </form>
             </div>
@@ -103,7 +103,7 @@
 
         {# 注册按钮 #}
         function registerBtnEvent(){
-            $("#regsterBtn").click(function () {
+            $("#registerBtn").click(function () {
                 $.ajax({
                     // 请求的 URL
                     url: '/user/reg/',

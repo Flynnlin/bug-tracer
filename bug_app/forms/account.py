@@ -88,9 +88,7 @@ class UserRegForm(BootstrapModelForm):
         mobile_phone = self.cleaned_data.get('mobile_phone')
         if not mobile_phone:
             return code
-
-        print(mobile_phone)
-        redis_code = conn.get('reg_code'+mobile_phone)
+        redis_code = conn.get('sms_code'+mobile_phone)
         if not redis_code:
             raise ValidationError("验证码已经失效或无")
         redis_code=redis_code.decode('utf-8')
@@ -98,12 +96,62 @@ class UserRegForm(BootstrapModelForm):
             raise ValidationError("验证码错误")
         return code
 
-class UserLoginForm(BootstrapModelForm):
+# 用户登录1
+class UserLogin_SMS_Form(BootstrapModelForm):
     captcha = forms.CharField(widget=forms.TextInput,label="验证码")
-    confirm_password = forms.CharField(widget=forms.PasswordInput(render_value=True), label="确认密码")  # 二次输入
     class Meta:
         model = UserInfo
-        fields = ['username', 'password','confirm_password','captcha']
+        fields = ['mobile_phone','captcha']
+
+    def clean_mobile_phone(self):
+        mobile_phone = self.cleaned_data['mobile_phone']
+        # 如果验证通过，phone钩子函数直接返回的用户对象
+        user_obj = UserInfo.objects.filter(mobile_phone=mobile_phone).first()
+        if not user_obj:
+            raise ValidationError('手机号不存在')
+        return user_obj
+    def clean_captcha(self):
+        code = self.cleaned_data['captcha']
+        conn = get_redis_connection('default')
+        mobile_phone = (self.cleaned_data.get('mobile_phone')).mobile_phone
+        if not mobile_phone:
+            return code
+        redis_code = conn.get('sms_code' + mobile_phone)
+        if not redis_code:
+            raise ValidationError("验证码已经失效或无")
+        redis_code = redis_code.decode('utf-8')
+        if redis_code != code:
+            raise ValidationError("验证码错误")
+        return code
+
+
+# 用户登录2
+class UserLogin_code_Form(BootstrapModelForm):
+    captcha = forms.CharField(widget=forms.TextInput, label="验证码")
+    class Meta:
+        model = UserInfo
+        fields = ['username','password','captcha']
+
+    def user_login(self, request):
+        # 判断用户名密码是否正确
+        if self.is_valid():
+            # 判断验证码
+            code_stxt = self.cleaned_data.pop('captcha')
+            if request.session.get('code_txt') != code_stxt:
+                self.add_error('captcha', '验证码错误或者过期')
+                return False, self,None
+            else:
+                password = self.cleaned_data['password']
+                self.cleaned_data['password'] = encrypt.toMd5(password)
+                user = UserInfo.objects.filter(**self.cleaned_data).first()
+                if user:
+                    return True, self, user
+                else:
+                    self.add_error('password', '用户名或密码错误')
+                    self.add_error('username', '用户名或密码错误')
+                    return False, self,None
+        else:
+            return False, self,None
 
 
 # 短信验证码Form
@@ -113,9 +161,9 @@ class SendSmsForm(BootstrapForm):
     def clean_mobile_phone(self):
         #手机号校验
         mobile_phone = self.cleaned_data['mobile_phone']
-        exits = UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
-        if exits:
-            raise ValidationError("手机号已经存在")
+        # exits = UserInfo.objects.filter(mobile_phone=mobile_phone).exists()
+        # if exits:
+        #     raise ValidationError("手机号已经存在")
 
         # 手机号校验
         code = sms_code.generate_sms_code()
@@ -124,6 +172,6 @@ class SendSmsForm(BootstrapForm):
             raise ValidationError(sres)
         # redis写入
         conn = get_redis_connection('default')
-        conn.set('reg_code'+mobile_phone, code,ex=60)
+        conn.set('sms_code'+mobile_phone, code,ex=60)
 
         return mobile_phone

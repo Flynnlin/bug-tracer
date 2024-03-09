@@ -1,0 +1,74 @@
+{% extends 'layout/index_layout.html' %}
+{% block title %}
+    登录
+{% endblock %}
+{% block body %}
+    <br>
+    <div  class="container" style="max-width: 700px; margin: 0 auto;">
+        <div id="loginCard" class="card container">
+            <div class="card-body">
+                <h1 id = "loginMode" class="card-title mb-3">手机号登录</h1>
+                <form id="userLogin_info" action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% for f in form %}
+                            <div class="col-6 mb-3">
+                                {% if f.name == 'captcha'   %}
+                                    <label class="form-label">{{ f.label }}:</label>
+                                    <div class="input-group">
+                                        {{ f }}
+                                        <img id="image_code" src="data:image/png;base64,{{ code_img_io }}" class="rounded-end" alt="">
+                                    </div>
+                                {% else %}
+                                    <label class="form-label">{{ f.label }}:</label>
+                                    {{ f }}
+                                {% endif %}
+                                <span class="alert-light" style="color: orangered;position: absolute;font-size: 15px">{{ f.errors.0 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-lg-end">
+                        <button id="loginBtn" type="submit" class="btn btn-primary" >提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+            <br>
+        <div class="text-center">
+            <!-- 添加切换按钮 -->
+            <button id="SwitchBtn" type="button" class="btn btn-outline-primary">切换登录方式</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block JavaScript %}
+<script>
+    $(function() {
+        // 页面框架加载完成后自动执行的内容
+        SwitchBtnEvent(); // 切换验证码方式按钮事件
+        flashimage_codeEvent();
+    })
+
+    {#切换登录模式#}
+    function SwitchBtnEvent(){
+        $("#SwitchBtn").click(function () {
+            window.location.href = '/user/login/sms/'
+        })
+    }
+    {#刷新验证码#}
+    function flashimage_codeEvent(){
+    $('#image_code').click(function (){
+        var imageCode = $(this);  // 保存 #image_code 元素的引用
+        $.ajax({
+            url: '/user/logincode/',
+            type: 'GET',
+            success: function(res) {
+                imageCode.attr('src', "data:image/png;base64," + res);  // 使用保存的引用更新 src 属性
+            }
+        });
+    });
+}
+
+
+</script>
+{% endblock %}

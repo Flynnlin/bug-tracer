@@ -14,7 +14,7 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Tracer</a>
+            <a class="navbar-brand" href="/index/">Tracer</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -35,10 +35,10 @@
 
                 </ul>
                 <form class="d-flex">
-    {% if request.session.username %}
+    {% if request.session.user_info.username %}
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ request.session.username }}
+                {{ request.session.user_info.username }}
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <li><a class="dropdown-item" href="#">Action</a></li>
@@ -47,7 +47,7 @@
             </ul>
         </div>
     {% else %}
-        <a class="btn btn-outline-success" href="/user/login/">登录</a>
+        <a class="btn btn-outline-success" href="/user/login/sms/">登录</a>
         <div class="mx-1"></div>
         <a class="btn btn-dark" href="/user/reg/">注册</a>
     {% endif %}
@@ -67,6 +67,7 @@
 
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
 <script src="{% static 'plugins/bootstrap-5.3.2/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-5.3.2/js/bootstrap.bundle.min.js' %}"></script>
 
 {%  block JavaScript %} {% endblock %}
 </body>
