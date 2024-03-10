@@ -2,12 +2,9 @@ import base64
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
-from bug_app.models import UserInfo
-from bug_app.forms.account import UserRegForm, UserLogin_SMS_Form, SendSmsForm, UserLogin_code_Form
-
-from django_redis import get_redis_connection
 from django.views.decorators.csrf import csrf_exempt
 
+from bug_app.forms.account import UserRegForm, UserLogin_SMS_Form, SendSmsForm, UserLogin_code_Form
 from bug_app.utils import captcha
 
 """# 用户账户  注册 登录 注销"""
@@ -87,10 +84,10 @@ def user_login_view(request):
                   {'form': Form,'code_img_io':request.session.get('code_img_io')})
 
 
-
+# 注销
 def user_logout(request):
     request.session.clear()
-    return redirect('/user/login/')
+    return redirect('/index/')
 
 
 # 生成图片验证码和设置

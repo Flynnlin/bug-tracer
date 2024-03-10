@@ -1,7 +1,17 @@
 {% extends 'layout/index_layout.html' %}
+{% load static %}
+{% block css %}
+    <style>
+    img{
+        width: 100%;
+    }
+    </style>
+{% endblock %}
 {% block title %}
     Tracer平台
 {% endblock %}
+
 {% block body %}
-<h1>首页</h1>
+    <img src="{% static 'img/index_img/index_img_2.png' %}">
+
 {% endblock %}

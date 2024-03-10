@@ -238,4 +238,5 @@ class ProjectInvite(models.Model):
     )
     period = models.IntegerField(verbose_name='有效期', choices=period_choices, default=1440)
     create_datetime = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-    creator = models.ForeignKey(verbose_name='创建者', to='UserInfo', related_name='create_invite', on_delete=models.CASCADE)
+    creator = models.ForeignKey(verbose_name='创建者', to='UserInfo', related_name='create_invite',
+                                on_delete=models.CASCADE)

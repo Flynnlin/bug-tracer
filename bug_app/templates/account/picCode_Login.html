@@ -7,7 +7,7 @@
     <div  class="container" style="max-width: 700px; margin: 0 auto;">
         <div id="loginCard" class="card container">
             <div class="card-body">
-                <h1 id = "loginMode" class="card-title mb-3">手机号登录</h1>
+                <h1 id = "loginMode" class="card-title mb-3">登录</h1>
                 <form id="userLogin_info" action="" method="post">
                     {% csrf_token %}
                     <div class="row">
@@ -60,7 +60,7 @@
     $('#image_code').click(function (){
         var imageCode = $(this);  // 保存 #image_code 元素的引用
         $.ajax({
-            url: '/user/logincode/',
+            url: '/send/logincode/',
             type: 'GET',
             success: function(res) {
                 imageCode.attr('src', "data:image/png;base64," + res);  // 使用保存的引用更新 src 属性

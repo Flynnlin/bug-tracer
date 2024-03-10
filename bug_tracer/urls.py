@@ -19,14 +19,16 @@ from django.urls import path
 from bug_app.views import userAccount_views,index_views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    # 网站首页
     path('index/',index_views.index_view,name='index'),
     # 用户账户
-    path('user/reg/', userAccount_views.user_register_view, name='user_register_view'),
+    path('user/reg/', userAccount_views.user_register_view, name='user_register'),
     path('user/login/sms/', userAccount_views.user_SMSlogin_view, name='user_login_sms'),
     path('user/login/', userAccount_views.user_login_view, name='user_login'),
+    path('user/logout/', userAccount_views.user_logout,name='user_logout'),
     path('send/sms/', userAccount_views.send_sms_view, name='sms_code'),
-    path('user/logincode/', userAccount_views.img_code_view, name='img_code'),
-    path('user/logout/', userAccount_views.user_logout,name='user_logout')
+    path('send/logincode/', userAccount_views.img_code_view, name='send_img_code'),
+
+    #系统页面
 
 ]
