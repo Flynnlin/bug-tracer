@@ -1,0 +1,18 @@
+{% with id=widget.attrs.id %}
+    <div{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.class %} class="{{ widget.attrs.class }}"{% endif %}>
+        {% for group, options, index in widget.optgroups %}
+            {% if group %}
+                <div>{% endif %}
+                    {% for option in options %}
+                        <div class="btn-group">
+                            <label class="btn btn-outline-primary btn-color" style="background-color: {{  option.label|default:'#ffffff' }};">
+                                <input type="radio" name="{{ option.name }}"  value="{{ option.value }}">
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% if group %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endwith %}

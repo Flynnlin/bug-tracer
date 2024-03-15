@@ -1,11 +1,13 @@
 import base64
+import datetime
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from bug_app.forms.account import UserRegForm, UserLogin_SMS_Form, SendSmsForm, UserLogin_code_Form
-from bug_app.utils import captcha
+from bug_app.utils import captcha, uuidStr
+from bug_app.models import Transaction, PricePolicy
 
 """# 用户账户  注册 登录 注销"""
 
@@ -16,7 +18,21 @@ def user_register_view(request):
         form = UserRegForm(request.POST)
         response_msg = {}
         if form.is_valid():  # 数据校验
-            form.save()  # 会自动剔除数据模型中没有的字段
+
+            instance = form.save()  # 会自动剔除数据模型中没有的字段
+
+            # 创建交易记录-（免费用户）
+            price_policy = PricePolicy.objects.get(category=1, title="个人免费版")
+            Transaction.objects.create(
+                status=2,
+                order=uuidStr.generate_order_number(),
+                user=instance,
+                price_policy=price_policy,
+                count = 0,
+                price = 0,
+                start_datetime=datetime.datetime.now()
+            )
+
             response_msg['status'] = True
             response_msg['reload'] = '/user/login/sms/'
         else:
@@ -35,12 +51,12 @@ def user_SMSlogin_view(request):
         response_msg = {}
         if form.is_valid():
             # 如果验证通过，phone钩子函数直接返回的用户对象
-            user_obj=form.cleaned_data['mobile_phone']
+            user_obj = form.cleaned_data['mobile_phone']
             response_msg['status'] = True
             response_msg['reload'] = '/index/'
 
             # 添加登录凭证
-            user_info={
+            user_info = {
                 'username': user_obj.username,
                 'user_id': user_obj.id
             }
@@ -55,12 +71,12 @@ def user_SMSlogin_view(request):
     return render(request, 'account/SMS_login.html',
                   {'form': Form})
 
+
 # 登录2
 def user_login_view(request):
-
     if request.method == 'POST':
         form = UserLogin_code_Form(request.POST)
-        success,userF, user_obj = form.user_login(request)
+        success, userF, user_obj = form.user_login(request)
         print(success)
         if success:
             # 添加登录凭证
@@ -76,12 +92,11 @@ def user_login_view(request):
             return render(request, 'account/picCode_Login.html',
                           {'form': userF, 'code_img_io': request.session.get('code_img_io')})
 
-
     img_code_view(request)
 
     Form = UserLogin_code_Form
-    return render(request,'account/picCode_Login.html',
-                  {'form': Form,'code_img_io':request.session.get('code_img_io')})
+    return render(request, 'account/picCode_Login.html',
+                  {'form': Form, 'code_img_io': request.session.get('code_img_io')})
 
 
 # 注销
@@ -90,16 +105,22 @@ def user_logout(request):
     return redirect('/index/')
 
 
+# 登录过期提示
+def login_timeout_view(request):
+    return render(request, 'account/loginTimeout.html')
+
 # 生成图片验证码和设置
 def img_code_view(request):
-    #图片验证码生成 每次访问都刷新
-    captcha_text, img_io=captcha.generate_captcha()
+    # 图片验证码生成 每次访问都刷新
+    captcha_text, img_io = captcha.generate_captcha()
     img_io_base64 = base64.b64encode(img_io.getvalue()).decode()
     request.session['code_txt'] = captcha_text  # 保存当次验证码
     request.session['code_img_io'] = img_io_base64
     request.session.set_expiry(60)  # 设置超时时间
 
     return HttpResponse(img_io_base64)
+
+
 # 发送验证码
 @csrf_exempt
 def send_sms_view(request):

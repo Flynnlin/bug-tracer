@@ -7,9 +7,9 @@ class UserInfo(models.Model):
     email = models.EmailField(verbose_name='邮箱', max_length=32)
     mobile_phone = models.CharField(verbose_name='手机号', max_length=32)
     password = models.CharField(verbose_name='密码', max_length=32)
-
-    price_policy = models.ForeignKey(verbose_name='价格策略', to='PricePolicy', null=True, blank=True,
-                               on_delete=models.SET_NULL)
+    # 更新： 创建用户后默认创建一条免费交易记录，后期直接通过查询最新有效交易记录，跨模型查用户余额
+    # price_policy = models.ForeignKey(verbose_name='价格策略', to='PricePolicy', null=True, blank=True,
+    #                            on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.username

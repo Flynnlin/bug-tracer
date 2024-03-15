@@ -5,31 +5,11 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django_redis import get_redis_connection
 
-from bug_app.models import UserInfo
+from bug_app.models import UserInfo,Transaction
 from bug_app.utils import sms_code,encrypt
+from bug_app.forms.BootStrapForm import BootstrapForm,BootstrapModelForm
 
 
-#样式继承
-class BootstrapModelForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(BootstrapModelForm, self).__init__(*args, **kwargs)
-        #循环找到所有的字段，并将他们的插件添加class
-        for name,field in self.fields.items():
-            if field.widget.attrs:
-                field.widget.attrs['class'] = 'form-control'
-                field.widget.attrs['placeholder'] ='请输入 %s' % (field.label,)
-            else:
-                field.widget.attrs = {'class':'form-control'}
-class BootstrapForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(BootstrapForm, self).__init__(*args, **kwargs)
-        #循环找到所有的字段，并将他们的插件添加class
-        for name,field in self.fields.items():
-            if field.widget.attrs:
-                field.widget.attrs['class'] = 'form-control'
-                field.widget.attrs['placeholder'] = '请输入 %s' % (field.label,)
-            else:
-                field.widget.attrs = {'class':'form-control'}
 
 #用户注册
 class UserRegForm(BootstrapModelForm):
@@ -128,6 +108,7 @@ class UserLogin_SMS_Form(BootstrapModelForm):
 # 用户登录2
 class UserLogin_code_Form(BootstrapModelForm):
     captcha = forms.CharField(widget=forms.TextInput, label="验证码")
+    password = forms.CharField(widget=forms.PasswordInput, label="密码")
     class Meta:
         model = UserInfo
         fields = ['username','password','captcha']
@@ -175,3 +156,9 @@ class SendSmsForm(BootstrapForm):
         conn.set('sms_code'+mobile_phone, code,ex=60)
 
         return mobile_phone
+
+# 添加交易记录
+class addTransaction(BootstrapModelForm):
+    class Meta:
+        model = Transaction
+        fields = '__all__'

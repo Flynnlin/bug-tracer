@@ -1,0 +1,228 @@
+{% extends 'layout/platform_layout.html' %}
+{% block title %}项目列表{% endblock %}
+{% block css  %}
+    <style>
+    .project{
+        margin-top: 10px;
+    }
+    .small-card{
+        width: 700px;
+    }
+  .small-card-header {
+    padding: 20px; /* 调整小面板 header 的内边距 */
+    font-size: 20px; /* 调整小面板 header 的字体大小 */
+    height: 110px; /* 设置小面板 header 的高度 */
+    background-color: #ffffff; /* 设置小面板 header 的背景颜色 */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* 设置小面板 header 的底部边框 */
+  }
+  .small-card-body {
+    padding: 10px; /* 调整小面板 body 的内边距 */
+    height: 40px; /* 设置小面板 body 的高度 */
+  }
+    </style>
+{% endblock %}
+
+
+
+{% block body %}
+<div class="container-fluid project">
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#creatProjectModal">✒️创建项目</button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#">✒️加入项目</button>
+
+</div>
+
+<!-- 添加项目模态框 -->
+<div class="modal fade" id="creatProjectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">创建项目</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- 在这里添加模态框内容 -->
+        <h1>✒️新建项目</h1>
+        <form id="addProjectForm">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                        {{ field }}
+                    <span class="errors" style="color: red"></span>
+                </div>
+            {% endfor %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+          <a id="addProjectBtn" type="button" class="btn btn-success">保存</a>
+        <!-- 如果需要添加其他按钮，可以在这里添加 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{#  展示项目  #}
+{#  我收藏的项目  #}
+<div class="card project" >
+  <div class="card-header">
+    🏷️我收藏的项目
+  </div>
+  <div class="card-body">
+    <div class="row small-card">
+      {% for item in project_dict.star %}
+      <div class="col-md-4">
+        <div class="card mb-3" style="border-color: {{ item.get_color_display }}">
+          <a style="text-decoration:none" href="#">
+              <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
+              {{ item.name }}
+            </div>
+          </a>
+        <div class="small-card-body d-flex justify-content-between align-items-center">
+            <a style="text-decoration:none" href="{% url 'project_star' project_type='stared' project_id=item.id %}">❤️</a>
+          👤: {{ item.creator }}
+          <span class="text-end ms-auto">👥: {{ item.join_count }}</span>
+        </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{#我创建的项目#}
+<div class="card project">
+  <div class="card-header">
+    🛠️我创建的项目
+  </div>
+  <div class="card-body">
+    <div class="row small-card">
+      {% for item in project_dict.created %}
+      <div class="col-md-4">
+        <div class="card mb-3" style="border-color: {{ item.get_color_display }}">
+          <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
+            {{ item.name }}
+          </div>
+          <div class="small-card-body d-flex justify-content-between align-items-center">
+              <a style="text-decoration:none" href="{% url 'project_star' project_type='my' project_id=item.id %}">🤍</a>
+            👤: {{ item.creator }}
+            <span class="text-end ms-auto">👥: {{ item.join_count }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{#我加入的项目#}
+<div class="card project">
+  <div class="card-header">
+    👨‍👨‍👦‍👦我加入的项目
+  </div>
+  <div class="card-body">
+    <div class="row small-card">
+      {% for item in project_dict.joined %}
+      <div class="col-md-4">
+        <div class="card mb-3" style="border-color: {{ item.get_color_display }}">
+          <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
+            {{ item.name }}
+          </div>
+          <div class="small-card-body d-flex justify-content-between align-items-center">
+            <a style="text-decoration:none" href="{% url 'project_star' project_type='join' project_id=item.id %}">🤍</a>
+
+          👤: {{ item.creator }}
+          <span class="text-end ms-auto">👥: {{ item.join_count }}</span>
+            </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- 在页面底部添加一个 Toast 容器 来弹出通知-->
+<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+
+{% endblock %}
+
+{% block JavaScript %}
+    <script type="text/javascript">
+        $(function (){
+            // 页面框架加载完成后自动执行的内容
+            addProjectBtnEvent(); // 点击添加项目保存按钮
+
+
+        })
+
+        function addProjectBtnEvent(){
+            $('#addProjectBtn').click(function (){
+                $.ajax({
+                    url: '/project/list/',
+                    type: 'POST', // 发送的请求类型为GET
+                    dataType: 'json', // 预期返回的数据类型为JSON
+                    data:$("#addProjectForm").serialize(),
+                    success: function (response){ // Ajax请求成功后的回调函数
+                        if (response.status){ // 如果返回的状态为成功
+                            location.reload(); // 重新加载页面
+                            showToast('通知','创建成功'); // 弹出订单删除成功的提示框
+                        } else { // 如果返回的状态为失败
+                            // 循环遍历错误信息，并将错误信息显示在相应的表单字段下方
+                            $.each(response.errors,function (name,value){
+                                $("#id_"+name).next().text(value[0]);
+                                console.log(name)
+                            })
+
+                        }
+                    }
+                });
+            });
+        }
+        // 用来显示通知
+        function showToast(title, content) {
+        // 创建 Toast 元素
+        var toastElement = document.createElement('div');
+        toastElement.classList.add('toast');
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+
+        // 添加 Toast 标题和内容
+        toastElement.innerHTML = `
+            <div class="toast-header">
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${content}
+            </div>
+        `;
+
+        // 添加到 Toast 容器中
+        document.getElementById('toastContainer').appendChild(toastElement);
+
+        // 创建一个 Bootstrap Toast 实例并显示
+        var toast = new bootstrap.Toast(toastElement);
+        toast.show();
+
+        // Toast 消失后移除 Toast 元素
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
+
+
+
+    </script>
+{% endblock %}

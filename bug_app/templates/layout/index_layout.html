@@ -21,28 +21,28 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/admins/list/">产品功能</a>
+                        <a class="nav-link" href="/index/function/">产品功能</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admins/list/">企业方案</a>
+                        <a class="nav-link" href="/index/scheme/">企业方案</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admins/list/">Doc</a>
+                        <a class="nav-link" href="/index/doc/">Doc</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admins/list/">价格</a>
+                        <a class="nav-link" href="/index/price/">价格</a>
                     </li>
+
 
                 </ul>
                 <form class="d-flex">
-    {% if request.tracer %}
+    {% if request.tracer.user %}
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ request.tracer.username }}
+                {{ request.tracer.user.username }}
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" href="#">管理中心</a></li>
-                <li><a class="dropdown-item" href="#">换头像</a></li>
+                <li><a class="dropdown-item" href="/project/list/">管理中心</a></li>
                 <li><a class="dropdown-item" href="/user/logout/">注销</a></li>
             </ul>
         </div>

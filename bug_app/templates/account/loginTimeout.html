@@ -1,0 +1,39 @@
+{#{% extends 'layout/index_layout.html' %}#}
+{% block title %}
+    登录过期提示
+{% endblock %}
+{% block css %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 {
+            color: #dc3545;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+{%  block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1>登录过期提示</h1>
+                <p>您当前的登录状态已过期，请重新登录。</p>
+                <a href="{% url 'user_login' %}" class="btn btn-primary">点击这里重新登录</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

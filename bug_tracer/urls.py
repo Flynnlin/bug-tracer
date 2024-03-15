@@ -16,11 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from bug_app.views import userAccount_views,index_views
+from bug_app.views import userAccount_views, index_views, project_views
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+
     # 网站首页
+    path('',index_views.index_view,name='index'),
     path('index/',index_views.index_view,name='index'),
+    path('index/doc/',index_views.index_doc_view,name='index_doc'),
+    path('index/function/',index_views.index_function_view,name='index_function'),
+    path('index/price/',index_views.index_price_view,name='index_price'),
+    path('index/scheme/',index_views.index_scheme_view,name='index_scheme'),
+
     # 用户账户
     path('user/reg/', userAccount_views.user_register_view, name='user_register'),
     path('user/login/sms/', userAccount_views.user_SMSlogin_view, name='user_login_sms'),
@@ -28,7 +36,10 @@ urlpatterns = [
     path('user/logout/', userAccount_views.user_logout,name='user_logout'),
     path('send/sms/', userAccount_views.send_sms_view, name='sms_code'),
     path('send/logincode/', userAccount_views.img_code_view, name='send_img_code'),
+    path('user/timeout/', userAccount_views.login_timeout_view, name='login_timeout'),
 
     #系统页面
-
+    path('project/list/', project_views.project_list_view, name='project_list'),
+    # 区分 project/star/my/1  project/star/join/1
+    path('project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project_views.project_star_view, name='project_star')
 ]

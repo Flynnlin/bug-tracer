@@ -1,3 +1,4 @@
+import json
 
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
@@ -36,20 +37,27 @@ def send_sms(code,number):
     request.add_query_param('SignName', "神的口袋")  # 签名
     request.add_query_param('TemplateCode', TemplateCode)  # 模板编号
     request.add_query_param('TemplateParam', f"{template}")  # 发送验证码内容
-    response = client.do_action_with_exception(request)
-    res=str(response, encoding='utf-8')
+    #生产环境
+    # response = client.do_action_with_exception(request)
+    # res=str(response, encoding='utf-8')
+
+    #测试环境
+    res ='OK'
+    print(res + code)
+
     if 'OK' in res:
         return True
     else:
-        return res
-
-    # print('SMS testOK'+code)
-    # return True
+        return json.loads(res)['Message']
 
 
 def generate_sms_code():
     return ''.join(random.choices('0123456789', k=4))
 
 if __name__ == '__main__':
-    code=generate_sms_code()
-    send_sms(code,'1838215936')
+    # 设置 Django 环境 测试
+    import django
+    django.setup()
+    print(settings.ACCESSKEY_ID)
+    # code=generate_sms_code()
+    # send_sms(code,'1838215936')
