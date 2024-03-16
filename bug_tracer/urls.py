@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from bug_app.views import userAccount_views, index_views, project_views
 
 urlpatterns = [
@@ -41,6 +41,20 @@ urlpatterns = [
     #系统页面
     path('project/list/', project_views.project_list_view, name='project_list'),
     # 区分 project/star/my/1  project/star/join/1
-    path('project/star/<str:project_type>/<int:project_id>/', project_views.project_star_view, name='project_star')
+    path('project/star/<str:project_type>/<int:project_id>/', project_views.project_star_view, name='project_star'),
+
+    #项目管理面板
+
+    path('project/<int:project_id>/', include(
+        [
+        path('dashboard/', project_views.project_dashboard_view, name='project_dashboard'),
+        # path('issues/', project_views.project_issues_view, name='project_issues'),
+        # path('statistics/', project_views.project_statistics_view, name='project_statistics'),
+        # path('file/', project_views.project_file_view, name='project_file'),
+        # path('wiki/', project_views.project_wiki_view, name='project_wiki'),
+        # path('settings/', project_views.project_settings_view, name='project_settings'),
+        ])
+    ),
+
 
 ]

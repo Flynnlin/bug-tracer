@@ -5,12 +5,12 @@
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <li>🔨</li>
         {% for p in created %}
-            <li><a class="dropdown-item" href="#">{{ p.name }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'project_dashboard' p.id %}">{{ p.name }}</a></li>
         {% endfor %}
         <div class="dropdown-divider"></div>
         <li>👨‍👨‍👦‍👦</li>
         {% for p in joined %}
-            <li><a class="dropdown-item" href="#">{{ p.project.name }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'project_dashboard' p.project.id %}">{{ p.project.name }}</a></li>
         {% endfor %}
         <div class="dropdown-divider"></div>
         <li><a class="dropdown-item" href="/project/list/">所有项目</a></li>

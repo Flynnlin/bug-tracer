@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from bug_app.forms.account import UserRegForm, UserLogin_SMS_Form, SendSmsForm, UserLogin_code_Form
+from bug_app.forms.account_form import UserRegForm, UserLogin_SMS_Form, SendSmsForm, UserLogin_code_Form
 from bug_app.utils import captcha, uuidStr
 from bug_app.models import Transaction, PricePolicy
 

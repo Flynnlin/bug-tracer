@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+
+    {% block css %}{% endblock %}
+
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-5.3.2/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome/css/fontawesome.min.css' %}">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/project/list/">Tracer管理</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {#  自定义模板标签#}
+                    {% load project_tags %}
+                    {% all_project_list_tags request %}
+                    <li class="nav-item">
+                            <a class="nav-link" href="/index/function/">工作台</a>
+                        </li>
+                </ul>
+                {#   右边             #}
+                <ul class="nav navbar-nav navbar-right>">
+                    <form class="d-flex">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/index/function/">工作台</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/index/function/">日历</a>
+                        </li>
+                        <li >
+                            <a class="nav-link" href="">💡</a>
+                        </li>
+                        <li >
+                            <a class="nav-link" href="">📚</a>
+                        </li>
+                        {# 下拉框  展示用户      #}
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ request.tracer.user.username }}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" >
+                                <li><a class="dropdown-item" href="{% url 'index' %}">官网</a></li>
+                                <li><a class="dropdown-item" href="/user/logout/">注销</a></li>
+                            </ul>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+        </div>
+</nav>
+
+
+
+{%  block body %} {% endblock %}
+<!-- 导入 Bootstrap JavaScript 文件 -->
+
+<script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-5.3.2/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-5.3.2/js/bootstrap.bundle.min.js' %}"></script>
+
+{%  block JavaScript %} {% endblock %}
+</body>
+</html>

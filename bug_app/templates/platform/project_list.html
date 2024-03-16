@@ -74,7 +74,7 @@
       {% for item in project_dict.star %}
       <div class="col-md-4">
         <div class="card mb-3" style="border-color: {{ item.get_color_display }}">
-          <a style="text-decoration:none" href="#">
+          <a style="text-decoration:none" href="{% url 'project_dashboard' item.id %}">
               <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
               {{ item.name }}
             </div>
@@ -100,9 +100,11 @@
       {% for item in project_dict.created %}
       <div class="col-md-4">
         <div class="card mb-3" style="border-color: {{ item.get_color_display }}">
-          <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
-            {{ item.name }}
-          </div>
+          <a style="text-decoration:none" href="{% url 'project_dashboard' item.id %}">
+              <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
+              {{ item.name }}
+            </div>
+          </a>
           <div class="small-card-body d-flex justify-content-between align-items-center">
               <a style="text-decoration:none" href="{% url 'project_star' project_type='my' project_id=item.id %}">🤍</a>
             👤: {{ item.creator }}
@@ -125,9 +127,11 @@
       {% for item in project_dict.joined %}
       <div class="col-md-4">
         <div class="card mb-3" style="border-color: {{ item.get_color_display }}">
-          <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
-            {{ item.name }}
-          </div>
+            <a style="text-decoration:none" href="{% url 'project_dashboard' item.id %}">
+              <div class="small-card-header" style="background-color: {{ item.get_color_display }}; color: white;">
+              {{ item.name }}
+            </div>
+          </a>
           <div class="small-card-body d-flex justify-content-between align-items-center">
             <a style="text-decoration:none" href="{% url 'project_star' project_type='join' project_id=item.id %}">🤍</a>
 

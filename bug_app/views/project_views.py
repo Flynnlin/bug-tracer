@@ -1,10 +1,10 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
-from bug_app.forms.project import ProjectModelform
+from bug_app.forms.project_form import ProjectModelform
 from bug_app.models import Project,ProjectUser
 
-
+#首页展示所有项目
 def project_list_view(request):
     # 从中间件获取当前用户
     current_user=request.tracer.user
@@ -40,10 +40,9 @@ def project_list_view(request):
             project_dict['star' if project.star else 'joined'].append(project.project)
 
         return render(request,'platform/project_list.html',{'form':form,'project_dict':project_dict})
-
-
-# 定义视图函数project_star_view，接受request、project_type和project_id参数
+# 项目收藏&取消
 def project_star_view(request, project_type, project_id):
+# 定义视图函数project_star_view，接受request、project_type和project_id参数
     # 获取当前用户
     current_user = request.tracer.user
 
@@ -76,3 +75,7 @@ def project_star_view(request, project_type, project_id):
     # 如果project_type不是上述三种情况，则返回错误响应
     else:
         return HttpResponse('错误')
+
+def project_dashboard_view(request, project_id):
+
+    return  render(request,'platform/project_dashboard.html')
