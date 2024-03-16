@@ -41,5 +41,6 @@ urlpatterns = [
     #系统页面
     path('project/list/', project_views.project_list_view, name='project_list'),
     # 区分 project/star/my/1  project/star/join/1
-    path('project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project_views.project_star_view, name='project_star')
+    path('project/star/<str:project_type>/<int:project_id>/', project_views.project_star_view, name='project_star')
+
 ]

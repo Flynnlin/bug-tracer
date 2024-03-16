@@ -20,15 +20,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            项目
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" href="#">1</a></li>
 
-                        </ul>
-                    </div>
+                    {#  自定义模板标签#}
+                    {% load project_tags %}
+                    {% all_project_list_tags request %}
 
                 </ul>
                 {#   右边             #}

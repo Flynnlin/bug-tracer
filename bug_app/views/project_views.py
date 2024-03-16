@@ -29,9 +29,9 @@ def project_list_view(request):
         form = ProjectModelform() #项目创建的form
 
         # 创建的项目
-        user_created_projects=Project.objects.filter(creator=current_user)
-        # 参与的项目 https://www.bilibili.com/video/BV1uA411b77M/?p=90&spm_id_from=pageDriver&vd_source=68cccc92a666a110c3d4162f94963373
-        user_joined_projects = ProjectUser.objects.filter(user=current_user)
+        user_created_projects = request.tracer.created_projects
+        # 参与的项目
+        user_joined_projects = request.tracer.joined_projects
         # 设置是三个列表 收藏、创建、参加
         project_dict={'star':[],'created':[],'joined':[]}
         for project in user_created_projects:

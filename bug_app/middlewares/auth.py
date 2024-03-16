@@ -3,7 +3,8 @@ from datetime import datetime
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 
-from bug_app.models import UserInfo, Transaction
+from bug_app.models import UserInfo, Transaction, Project, ProjectUser
+
 
 class Tracer(object):
     def __init__(self):
@@ -29,6 +30,14 @@ class AuthMiddleware(MiddlewareMixin):
                 #过期则使用免费版策略
                 user_newtra = Transaction.objects.filter(user=user_obj, status=2,price_policy__category=1).first()
             request.tracer.price_policy = user_newtra.price_policy
+
+            # 获取当前用户的项目信息
+            # 创建的项目
+            user_created_projects = Project.objects.filter(creator=user_obj)
+            # 参与的项目
+            user_joined_projects = ProjectUser.objects.filter(user=user_obj)
+            request.tracer.created_projects = user_created_projects
+            request.tracer.joined_projects = user_joined_projects
 
         # 页面白名单，login页面不需要鉴权
         allowed_url = [

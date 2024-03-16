@@ -1,0 +1,18 @@
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        项目
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li>🔨</li>
+        {% for p in created %}
+            <li><a class="dropdown-item" href="#">{{ p.name }}</a></li>
+        {% endfor %}
+        <div class="dropdown-divider"></div>
+        <li>👨‍👨‍👦‍👦</li>
+        {% for p in joined %}
+            <li><a class="dropdown-item" href="#">{{ p.project.name }}</a></li>
+        {% endfor %}
+        <div class="dropdown-divider"></div>
+        <li><a class="dropdown-item" href="/project/list/">所有项目</a></li>
+    </ul>
+</div>
