@@ -1,6 +1,4 @@
-import json
 import markdown
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -41,7 +39,25 @@ def project_wiki_detail_view(request, project_id,wiki_id):
         Wiki.objects.filter(project=request.tracer.project).order_by('depth', 'id').values_list('id', 'title',
                                                                                                     'parent'))
     wiki = Wiki.objects.get(id=wiki_id)
-    wiki.content = markdown.markdown(wiki.content)
+    extensions = [
+        'extra',
+        'toc',
+        'tables',
+        'codehilite',
+        'fenced_code',
+        'footnotes',
+        'admonition',
+        'attr_list',
+        'def_list',
+        'abbr',
+        'md_in_html',
+        'meta',
+        'nl2br',
+        'sane_lists',
+        'smarty',
+        'wikilinks',
+    ]
+    wiki.content = markdown.markdown(wiki.content, extensions=extensions)
     wiki.content = wiki.content.replace('<img', '<img class="markdown-img"')
     return render(request,'platform/wiki/wiki_detail.html',{'wiki':wiki,'wiki_list':wiki_list})
 

@@ -5,7 +5,21 @@
 {% endblock %}
 {% block css %}
     <style>
-            .markdown-img {
+    table {
+            width: 100%;
+            border: 3px solid #dee2e6; /* 添加单元格边框 */
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        th, td {
+            border: 1px solid #842029; /* 添加单元格边框 */
+            padding: 0.5rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+    .markdown-img {
             max-width: 100%; /* 设置图片的最大宽度为父元素的宽度 */
             max-height: 400px;
             {#height: auto; /* 高度自动调整，保持图片比例 */#}
