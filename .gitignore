@@ -13,3 +13,4 @@ media/
 #database migrations
 */migrations/*.py
 !*/migrations/init_·py
+/uploads/editor/

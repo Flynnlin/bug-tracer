@@ -14,9 +14,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import include
+from django.contrib import admin
+from django.urls import path, re_path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from bug_app.views import userAccount_views, index_views, project_views
+from bug_app.views import userAccount_views, index_views, project_views,wiki_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,17 +49,25 @@ urlpatterns = [
     path('project/star/<str:project_type>/<int:project_id>/', project_views.project_star_view, name='project_star'),
 
     #项目管理面板
-
-    path('project/<int:project_id>/', include(
+    path('project/<int:project_id>/dashboard/', include(
         [
-        path('dashboard/', project_views.project_dashboard_view, name='project_dashboard'),
+        path('', project_views.project_dashboard_view, name='project_dashboard'),
         # path('issues/', project_views.project_issues_view, name='project_issues'),
         # path('statistics/', project_views.project_statistics_view, name='project_statistics'),
         # path('file/', project_views.project_file_view, name='project_file'),
-        # path('wiki/', project_views.project_wiki_view, name='project_wiki'),
+        path('wiki/', include([
+            path('',wiki_view.project_wiki_list_view, name='project_wiki'),
+            path('add/',wiki_view.project_wiki_add_view, name='project_wiki_add'),
+            path('<int:wiki_id>/',wiki_view.project_wiki_detail_view, name='project_wiki_detail'),
+            path('<int:wiki_id>/del/',wiki_view.project_wiki_del_view, name='project_wiki_del'),
+            path('<int:wiki_id>/edit/',wiki_view.project_wiki_edit_view, name='project_wiki_edit'),
+
+        ])),
         # path('settings/', project_views.project_settings_view, name='project_settings'),
         ])
     ),
-
-
+    path('mdeditor/', include(('mdeditor.urls', 'mdeditor'), namespace='mdeditor')), # 配置编辑器路由
 ]
+if settings.DEBUG:
+    # static files (images, css, javascript, etc.)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

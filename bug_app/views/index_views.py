@@ -3,9 +3,13 @@ from django.shortcuts import render
 # Create your views here.
 
 
+"""
+官网首页
+
+四个页面
+"""
 
 
-#官网首页
 def index_view(request):
     return render(request,'index/index.html')
 def index_doc_view(request):

@@ -5,6 +5,18 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
 
+    <style>
+    .project {
+        margin: 10px;
+    }
+    .panel {
+        margin: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        min-height: 300px;
+    }
+    </style>
     {% block css %}{% endblock %}
 
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-5.3.2/css/bootstrap.min.css' %}">
@@ -14,27 +26,43 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/project/list/">Tracer管理</a>
+            <a class="navbar-brand" href="#">{{ request.tracer.project.name }}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                {#   左边             #}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     {#  自定义模板标签#}
                     {% load project_tags %}
                     {% all_project_list_tags request %}
                     <li class="nav-item">
-                            <a class="nav-link" href="/index/function/">工作台</a>
-                        </li>
+                            <a class="nav-link" href="{% url 'project_dashboard' request.tracer.project.id %}">概览</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="">问题</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="">文件</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="{% url 'project_wiki' request.tracer.project.id %}">wiki</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="">统计</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="">设置</a>
+                    </li>
                 </ul>
                 {#   右边             #}
                 <ul class="nav navbar-nav navbar-right>">
                     <form class="d-flex">
                         <li class="nav-item">
-                            <a class="nav-link" href="/index/function/">工作台</a>
+                            <a class="nav-link" href="">工作台</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/index/function/">日历</a>
+                            <a class="nav-link" href="">日历</a>
                         </li>
                         <li >
                             <a class="nav-link" href="">💡</a>

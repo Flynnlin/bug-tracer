@@ -2,8 +2,15 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from bug_app.forms.project_form import ProjectModelform
-from bug_app.models import Project,ProjectUser
+from bug_app.models import Project, ProjectUser, Wiki
 
+"""
+管理面板的进入
+
+所有项目列表
+项目收藏
+项目面板
+"""
 #首页展示所有项目
 def project_list_view(request):
     # 从中间件获取当前用户
@@ -76,6 +83,12 @@ def project_star_view(request, project_type, project_id):
     else:
         return HttpResponse('错误')
 
-def project_dashboard_view(request, project_id):
 
+# 进入项目
+def project_dashboard_view(request, project_id):
+    #当访问项目管理的url时，会触发中间件
+    #鉴权
+    #记录project信息到request中
     return  render(request,'platform/project_dashboard.html')
+
+

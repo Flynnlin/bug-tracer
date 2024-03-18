@@ -1,0 +1,99 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+
+{% block title %}
+    Wiki
+{% endblock %}
+{% block css %}
+    <style>
+
+        /* 自定义的catalog样式 */
+        .catalog {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .catalog > div {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .catalog ul {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+
+        .catalog ul li {
+            margin-bottom: 5px;
+        }
+
+        .catalog ul ul {
+            padding-left: 20px;
+        }
+        .catalog a {
+            text-decoration: none;
+            color: #4d5154;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="card project">
+    <div class="card-header" style="display: flex; justify-content: space-between;">
+        <div style="align-self: flex-start;">📝 wiki 文档</div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+        {#  目录  style+div+js init_catalog函数  #}
+            <div class="panel catalog col-md-3">
+                <div>目录</div>
+
+                {#   根目录          #}
+                <ul id="catalog">
+
+                </ul>
+                <!-- 左侧内容，用于显示wiki目录 -->
+            </div>
+            <div class="panel col-md-8">
+                <div class="container">
+                        <h1 class="mb-4">添加文档</h1>
+                        <form action="" method="post" novalidate>
+                            {% csrf_token %}
+                             {{ form.media }}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block JavaScript %}
+    <script>
+        $(function (){
+            init_catalog();
+        });
+        function init_catalog(){
+            var catalog_ul = $('#catalog');
+            {% for wiki in wiki_list %}
+                var url = "{% url 'project_wiki_detail' project_id=request.tracer.project.id wiki_id=wiki.0  %}"
+                {#不存在 则为顶级wiki#}
+                {% if not wiki.2 %}
+                    var li_html = '<li><a href="'+url+'">' + '{{ wiki.1 }}' + '</a></li><ul id="wiki_' + '{{ wiki.0 }}' + '"></ul>';
+                    catalog_ul.append(li_html);
+                {#存在 则为儿子wiki#}
+                {% else %}
+                    var parent_ul = $('#wiki_'+{{ wiki.2 }});
+                    var li_html = '<li><a href="'+url+'">' + '{{ wiki.1 }}' + '</a></li><ul id="wiki_' + '{{ wiki.0 }}' + '"></ul>';
+                    parent_ul.append(li_html)
+                {% endif %}
+
+            {% endfor %}
+
+        }
+    </script>
+{% endblock %}

@@ -1,4 +1,6 @@
 from django.db import models
+from mdeditor.fields import MDTextField
+
 
 # Create your models here.
 
@@ -99,18 +101,13 @@ class ProjectUser(models.Model):
 class Wiki(models.Model):
     project = models.ForeignKey(verbose_name='项目', to='Project', on_delete=models.CASCADE)
     title = models.CharField(verbose_name='标题', max_length=32)
-    content = models.TextField(verbose_name='内容')
-
+    content = MDTextField(verbose_name='内容')
     depth = models.IntegerField(verbose_name='深度', default=1)
-
     # 子关联
     parent = models.ForeignKey(verbose_name='父文章', to="Wiki", null=True, blank=True, related_name='children',
-                               on_delete=models.SET_NULL)
-
+                               on_delete=models.CASCADE)
     def __str__(self):
         return self.title
-
-
 class FileRepository(models.Model):
     """ 文件库 """
     project = models.ForeignKey(verbose_name='项目', to='Project', on_delete=models.CASCADE)

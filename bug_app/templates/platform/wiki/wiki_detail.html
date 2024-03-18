@@ -1,0 +1,103 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+
+{% block title %}
+    Wiki
+{% endblock %}
+{% block css %}
+    <style>
+            .markdown-img {
+            max-width: 100%; /* 设置图片的最大宽度为父元素的宽度 */
+            max-height: 400px;
+            {#height: auto; /* 高度自动调整，保持图片比例 */#}
+        }
+        /* 自定义的catalog样式 */
+        .catalog {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .catalog > div {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .catalog ul {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+
+        .catalog ul li {
+            margin-bottom: 5px;
+        }
+
+        .catalog ul ul {
+            padding-left: 20px;
+        }
+        .catalog a {
+            text-decoration: none;
+            color: #4d5154;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="card project">
+<div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>📝 wiki 文档</div>
+    <div>
+        <a style="text-decoration: none; margin-right: 10px;" href="{% url 'project_wiki_edit' project_id=request.tracer.project.id wiki_id=wiki.id %}">编辑✏️</a>
+        <a class="btn btn-danger" href="{% url 'project_wiki_del' project_id=request.tracer.project.id wiki_id=wiki.id %}" style="vertical-align: middle;">删除</a>
+    </div>
+</div>
+
+
+    <div class="card-body">
+        <div class="row">
+        {#  目录  style+div+js init_catalog函数  #}
+            <div class="panel catalog col-md-3">
+                <div>目录</div>
+
+                {#   根目录          #}
+                <ul id="catalog">
+
+                </ul>
+                <!-- 左侧内容，用于显示wiki目录 -->
+            </div>
+            <div class="panel col-md-8">
+                <div class="container">
+                        <h2 class="mb-4">{{ wiki.title }}</h2>
+                        {{ wiki.content|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block JavaScript %}
+    <script>
+        $(function (){
+            init_catalog();
+        });
+        function init_catalog(){
+            var catalog_ul = $('#catalog');
+            {% for wiki in wiki_list %}
+                var url = "{% url 'project_wiki_detail' project_id=request.tracer.project.id wiki_id=wiki.0  %}"
+                {#不存在 则为顶级wiki#}
+                {% if not wiki.2 %}
+                    var li_html = '<li><a href="'+url+'">' + '{{ wiki.1 }}' + '</a></li><ul id="wiki_' + '{{ wiki.0 }}' + '"></ul>';
+                    catalog_ul.append(li_html);
+                {#存在 则为儿子wiki#}
+                {% else %}
+                    var parent_ul = $('#wiki_'+{{ wiki.2 }});
+                    var li_html = '<li><a href="'+url+'">' + '{{ wiki.1 }}' + '</a></li><ul id="wiki_' + '{{ wiki.0 }}' + '"></ul>';
+                    parent_ul.append(li_html)
+                {% endif %}
+
+            {% endfor %}
+
+        }
+    </script>
+{% endblock %}

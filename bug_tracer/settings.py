@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "bug_app.apps.BugAppConfig"
+    "bug_app.apps.BugAppConfig",
+    # 注册markdown的应用
+    'mdeditor',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'bug_app.middlewares.auth.AuthMiddleware',
+    'bug_app.middlewares.auth.AuthMiddleware2',
 ]
 
 ROOT_URLCONF = 'bug_tracer.urls'
@@ -143,6 +146,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+MEDIA_ROOT = os.path.join(BASE_DIR,'uploads')
+MEDIA_URL = "/uploads/"
+
 
 # SMS=1 短信接口信息
 ACCESSKEY_ID = '1'

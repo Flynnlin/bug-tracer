@@ -9,7 +9,10 @@ from bug_app.forms.account_form import UserRegForm, UserLogin_SMS_Form, SendSmsF
 from bug_app.utils import captcha, uuidStr
 from bug_app.models import Transaction, PricePolicy
 
-"""# 用户账户  注册 登录 注销"""
+"""
+用户账户  注册 登录 注销
+相关实现
+"""
 
 
 # 注册
