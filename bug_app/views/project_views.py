@@ -2,7 +2,8 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from bug_app.forms.project_form import ProjectModelform
-from bug_app.models import Project, ProjectUser, Wiki
+from bug_app.models import Project, ProjectUser
+from bug_app.utils import oss, uuidStr
 
 """
 管理面板的进入
@@ -10,6 +11,7 @@ from bug_app.models import Project, ProjectUser, Wiki
 所有项目列表
 项目收藏
 项目面板
+
 """
 #首页展示所有项目
 def project_list_view(request):
@@ -21,7 +23,13 @@ def project_list_view(request):
         rep_msg={}
         form=ProjectModelform(request.POST,request=request)
         if form.is_valid():
+            #创建桶
+            bucketName = "{}-{}".format(current_user.mobile_phone, uuidStr.generate_order_number())
+            cloud=oss.ConnectOss()
+            cloud.create_bucket(bucketName)
 
+            form.instance.bucket=bucketName
+            form.instance.region="chengdu"
             form.instance.creator=current_user
             form.save()
 
@@ -45,8 +53,9 @@ def project_list_view(request):
             project_dict['star' if project.star else 'created'].append(project)
         for project in user_joined_projects:
             project_dict['star' if project.star else 'joined'].append(project.project)
-
         return render(request,'platform/project_list.html',{'form':form,'project_dict':project_dict})
+
+
 # 项目收藏&取消
 def project_star_view(request, project_type, project_id):
 # 定义视图函数project_star_view，接受request、project_type和project_id参数

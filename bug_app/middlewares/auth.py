@@ -66,18 +66,24 @@ class AuthMiddleware(MiddlewareMixin):
 class AuthMiddleware2(MiddlewareMixin):
     def process_request(self, request):
         path = request.path
-        if path.startswith('/project/') and '/dashboard/' in path:
-            user=request.tracer.user
+        user = request.tracer.user
+        project_id = None
+        if path == '/mdeditor/uploads/':
+            referer = request.headers.get('Referer')
+            if referer:
+                referer_path = referer.split(request.get_host())[1]
+                project_id = referer_path.split('/')[2]  # 提取项目ID
+        if (path.startswith('/project/') and '/dashboard/' in path):
             # 进行权限检查
             project_id = path.split('/')[2]  # 提取项目ID
-
-            #判断是否有进入的权限（要求用户创建的或者参与的）
-            access = (Project.objects.filter(id=project_id,creator=user).exists()
-                      or ProjectUser.objects.filter(project_id=project_id,user=user).exists())
+        if project_id is not None:
+            # 判断是否有进入的权限（要求用户创建的或者参与的）
+            access = (Project.objects.filter(id=project_id, creator=user).exists()
+                      or ProjectUser.objects.filter(project_id=project_id, user=user).exists())
             if not access:
                 return HttpResponseForbidden("""<!DOCTYPE html>
-<html lang="en">
-<head>
+    <html lang="en">
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Permission Denied</title>
@@ -92,31 +98,90 @@ class AuthMiddleware2(MiddlewareMixin):
             align-items: center;
             height: 100vh;
         }
-
+    
         .container {
             text-align: center;
         }
-
+    
         h1 {
             color: #dc3545;
             font-size: 24px;
             margin-bottom: 20px;
         }
-
+    
         p {
             color: #6c757d;
             font-size: 16px;
         }
     </style>
-</head>
-<body>
+    </head>
+    <body>
     <div class="container">
         <h1>Permission Denied</h1>
         <p>You don't have permission to access this project.</p>
     </div>
-</body>
-</html>
-""")
+    </body>
+    </html>
+    """)
             else:
-                request.tracer.project=Project.objects.get(id=project_id)
+                request.tracer.project = Project.objects.get(id=project_id)
             return  # 通过
+
+
+# class AuthMiddleware2(MiddlewareMixin):
+#     def process_request(self, request):
+#         path = request.path
+#         if path.startswith('/project/') and '/dashboard/' in path:
+#             user=request.tracer.user
+#             # 进行权限检查
+#             project_id = path.split('/')[2]  # 提取项目ID
+#
+#             #判断是否有进入的权限（要求用户创建的或者参与的）
+#             access = (Project.objects.filter(id=project_id,creator=user).exists()
+#                       or ProjectUser.objects.filter(project_id=project_id,user=user).exists())
+#             if not access:
+#                 return HttpResponseForbidden("""<!DOCTYPE html>
+# <html lang="en">
+# <head>
+#     <meta charset="UTF-8">
+#     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+#     <title>Permission Denied</title>
+#     <style>
+#         body {
+#             font-family: Arial, sans-serif;
+#             background-color: #f8f9fa;
+#             margin: 0;
+#             padding: 0;
+#             display: flex;
+#             justify-content: center;
+#             align-items: center;
+#             height: 100vh;
+#         }
+#
+#         .container {
+#             text-align: center;
+#         }
+#
+#         h1 {
+#             color: #dc3545;
+#             font-size: 24px;
+#             margin-bottom: 20px;
+#         }
+#
+#         p {
+#             color: #6c757d;
+#             font-size: 16px;
+#         }
+#     </style>
+# </head>
+# <body>
+#     <div class="container">
+#         <h1>Permission Denied</h1>
+#         <p>You don't have permission to access this project.</p>
+#     </div>
+# </body>
+# </html>
+# """)
+#             else:
+#                 request.tracer.project=Project.objects.get(id=project_id)
+#             return  # 通过
