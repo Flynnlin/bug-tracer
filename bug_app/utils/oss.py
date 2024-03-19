@@ -1,3 +1,4 @@
+import sys
 import oss2
 from django.conf import settings
 class ConnectOss(object):
@@ -62,14 +63,22 @@ class ConnectOss(object):
 
 
     #####################################################
+    def percentage(consumed_bytes, total_bytes):
+        if total_bytes:
+            rate = int(100 * (float(consumed_bytes) / float(total_bytes)))
+            print('\r{0}% '.format(rate), end='')
+            sys.stdout.flush()
     def upload_file(self,bucket_name, remote_file_path,local_file_path):
-        print(isinstance(local_file_path, str))
         # 上传文件到OSS。
         # yourObjectName由包含文件后缀，不包含Bucket名称组成的Object完整路径，例如abc/efg/123.jpg。
-        # yourLocalFile由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt  &  接受文件对象
+        # yourLocalFile由本地文件路径加文件名包括后缀组成，例如/users/local/myfile.txt
+        # local_file_path  接受文件对象
+        # local_file_path 为''则表示创建文件夹，remote_file_path应该为文件夹名
         try:
             bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
-            if isinstance(local_file_path, str):
+            if local_file_path == '': #创建文件夹
+                bucket.put_object(remote_file_path, local_file_path)
+            elif isinstance(local_file_path, str):
                 bucket.put_object_from_file(remote_file_path, local_file_path)
             else:
                 bucket.put_object(remote_file_path, local_file_path.read())
@@ -104,6 +113,26 @@ class ConnectOss(object):
         except Exception as e:
             return e
         return True
+
+
+    def create_folder(self,bucket_name,remote_file_path):
+        try:
+            bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
+            bucket.put_object(remote_file_path, '')
+        except Exception as e:
+            return e
+        return True
+    def delete_folder(self,bucket_name,remote_file_path):
+        # 删除目录及目录下的所有文件。
+        #remote_file_path="exampledir/"
+        try:
+            bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
+            for obj in oss2.ObjectIterator(bucket, prefix=remote_file_path):
+                bucket.delete_object(obj.key)
+        except Exception as e:
+            return e
+        return True
+
 
 if __name__ == '__main__':
     import os
