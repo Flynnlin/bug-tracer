@@ -30,8 +30,8 @@ class PricePolicy(models.Model):
 
     project_num = models.PositiveIntegerField(verbose_name='项目数')
     project_member = models.PositiveIntegerField(verbose_name='项目成员数')
-    project_space = models.PositiveIntegerField(verbose_name='单项目空间', help_text='G')
-    per_file_size = models.PositiveIntegerField(verbose_name='单文件大小', help_text="M")
+    project_space = models.BigIntegerField(verbose_name='单项目空间', help_text='B')
+    per_file_size = models.BigIntegerField(verbose_name='单文件大小', help_text="B")
 
     create_datetime = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
@@ -96,8 +96,6 @@ class ProjectUser(models.Model):
     star = models.BooleanField(verbose_name='星标', default=False)
 
     create_datetime = models.DateTimeField(verbose_name='加入时间', auto_now_add=True)
-
-
 class Wiki(models.Model):
     project = models.ForeignKey(verbose_name='项目', to='Project', on_delete=models.CASCADE)
     title = models.CharField(verbose_name='标题', max_length=32)
@@ -115,18 +113,17 @@ class FileRepository(models.Model):
         (1, '文件'),
         (2, '文件夹')
     )
-    file_type = models.SmallIntegerField(verbose_name='类型', choices=file_type_choices)
+    file_type = models.SmallIntegerField(verbose_name='类型', choices=file_type_choices, default=1)
     name = models.CharField(verbose_name='文件夹名称', max_length=32, help_text="文件/文件夹名")
-    key = models.CharField(verbose_name='文件储存在COS中的KEY', max_length=128, null=True, blank=True)
 
     # int类型最大表示的数据
-    file_size = models.BigIntegerField(verbose_name='文件大小', null=True, blank=True, help_text='字节')
+    file_size = models.BigIntegerField(verbose_name='文件大小', null=True, blank=True, help_text='B')
 
     file_path = models.CharField(verbose_name='文件路径', max_length=255, null=True,
                                  blank=True)  # https://桶.cos.ap-chengdu/....
 
     parent = models.ForeignKey(verbose_name='父级目录', to='self', related_name='child', null=True, blank=True,
-                               on_delete=models.SET_NULL)
+                               on_delete=models.CASCADE)
 
     update_user = models.ForeignKey(verbose_name='最近更新者', to='UserInfo', on_delete=models.CASCADE)
     update_datetime = models.DateTimeField(verbose_name='更新时间', auto_now=True)

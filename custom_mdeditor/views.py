@@ -1,11 +1,3 @@
-"""
-支持mdeditor图片上传到阿里云OSS中
-
-复制到venv/Lib/site-packages/mdeditor/views.py中
-
-"""
-
-
 # -*- coding:utf-8 -*-
 import os
 import datetime
@@ -17,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from .configs import MDConfig
 
-
+# TODO 此处获取default配置，当用户设置了其他配置时，此处无效，需要进一步完善
 MDEDITOR_CONFIGS = MDConfig('default')
 
 
@@ -80,7 +72,7 @@ class UploadView(generic.View):
             auth = oss2.Auth(settings.OSS_ACCESS_KEY_ID, settings.OSS_ACCESS_KEY_SECRET)
             bucket = oss2.Bucket(auth, settings.OSS_ENDPOINT, BUCKET_NAME)
             bucket.put_object('wikieditor/'+file_full_name, upload_image.read())
-            url = f"https://{BUCKET_NAME}.{settings.OSS_ENDPOINT.replace('http://','')}/{file_full_name}"
+            url = f"https://{BUCKET_NAME}.{settings.OSS_ENDPOINT.replace('http://','')}/wikieditor/{file_full_name}"
         else:
             with open(os.path.join(file_path, file_full_name), 'wb+') as file:
                 for chunk in upload_image.chunks():

@@ -43,7 +43,7 @@
                             <a class="nav-link" href="">问题</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" href="">文件</a>
+                            <a class="nav-link" href="{% url 'project_file' request.tracer.project.id %}">文件</a>
                     </li>
                     <li class="nav-item">
                             <a class="nav-link" href="{% url 'project_wiki' request.tracer.project.id %}">wiki</a>

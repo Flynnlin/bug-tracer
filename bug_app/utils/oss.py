@@ -77,6 +77,7 @@ class ConnectOss(object):
         try:
             bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
             if local_file_path == '': #创建文件夹
+                # 目录名称，目录需以正斜线结尾。
                 bucket.put_object(remote_file_path, local_file_path)
             elif isinstance(local_file_path, str):
                 bucket.put_object_from_file(remote_file_path, local_file_path)
@@ -100,6 +101,28 @@ class ConnectOss(object):
     def get_url_file(self,bucket_name,remote_file_path):
         url="https://{}.oss-cn-{}.aliyuncs.com/{}".format(bucket_name,"chengdu",remote_file_path)
         return url
+
+    def rename_file(self,bucket_name,src_object_name,dest_object_name):
+        #重命名文件本质上就是先复制一份，然后再把旧的删了
+        try:
+            bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
+            result = bucket.copy_object(bucket_name, src_object_name, dest_object_name)
+
+            # 查看返回结果的状态。如果返回值为200，表示执行成功。
+            print('result.status:', result.status)
+
+            # 删除srcobject.txt。
+            result_del = bucket.delete_object(src_object_name)
+
+            # 查看返回结果的状态。如果返回值为204，表示执行成功。
+            print('result.status:', result_del.status)
+        except Exception as e:
+            return e
+        return self.get_url_file(bucket_name,dest_object_name)
+
+
+
+
     def file_list(self,bucket_name):
         pass
     def bucket_list(self):
@@ -109,13 +132,14 @@ class ConnectOss(object):
         try:
             bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
             # yourObjectName表示删除OSS文件时需要指定包含文件后缀，不包含Bucket名称在内的完整路径，例如abc/efg/123.jpg。
-            bucket.delete_object('yourObjectName')
+            bucket.delete_object(remote_file_path)
         except Exception as e:
             return e
         return True
 
 
     def create_folder(self,bucket_name,remote_file_path):
+        # 目录名称，目录需以正斜线结尾。
         try:
             bucket = oss2.Bucket(self.auth, self.endpoint, bucket_name)
             bucket.put_object(remote_file_path, '')
@@ -141,12 +165,13 @@ if __name__ == '__main__':
     django.setup()
 
     co = ConnectOss()
+    print(co.delete_file("18382135936-f5b147bf75d54790805a65cd3addc321","fileRepository/测试/厕所/2024-03-20_00-38.png"))
     # result = co.bucket_list()
     # result = co.delete_bucket('123kjsvdsasd')
 
     # print(str(co.storage_bucket('123kjsvdsasd').storage_size_in_bytes/1024)+'KB')
 
     # print(co.create_bucket('123kjsvdsasd'))
-    res=remote_file_path=co.upload_file('18382135936-15712c7f4dbf4657bc043243a0961508', 't1/b23.jpg', r'C:\Users\flynn\Downloads\biye-cuit\project\bug_tracer\uploads\editor\kali-menu.png')
+    # res=remote_file_path=co.upload_file('18382135936-15712c7f4dbf4657bc043243a0961508', 't1/b23.jpg', r'C:\Users\flynn\Downloads\biye-cuit\project\bug_tracer\uploads\editor\kali-menu.png')
     # result=co.get_url_file('18382135936-15712c7f4dbf4657bc043243a0961508',remote_file_path)
-    print(res)
+    # print(res)

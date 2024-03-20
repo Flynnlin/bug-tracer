@@ -12,8 +12,8 @@ def add_price_policies():
             price=0,
             project_num=5,
             project_member=2,
-            project_space=10,
-            per_file_size=2,
+            project_space=10*1024*1024,   #10MB--字节
+            per_file_size=2*1024*1024,
         )
 
     # 添加VIP价格策略
@@ -24,8 +24,8 @@ def add_price_policies():
             price=199,
             project_num=20,
             project_member=100,
-            project_space=50 * 1024,  # 50G转换为M
-            per_file_size=500,
+            project_space=50 * 1024*1024*1024,  # 50G转换为字节
+            per_file_size=500*1024*1024,
         )
 
     # 添加SVIP价格策略
@@ -36,8 +36,8 @@ def add_price_policies():
             price=299,
             project_num=50,
             project_member=200,
-            project_space=100 * 1024,  # 100G转换为M
-            per_file_size=1024,  # 1G转换为M
+            project_space=100 * 1024*1024*1024,  # 100G转换为字节
+            per_file_size=1 * 1024*1024*1024,  # 1G转换为字节
         )
 
     print("价格策略添加成功！")

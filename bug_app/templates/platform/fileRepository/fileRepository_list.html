@@ -1,0 +1,251 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+
+{% block title %}
+    文件管理
+{% endblock %}
+
+{% block css %}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="card project">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div><a href="{% url 'project_file' request.tracer.project.id%}">📂文件库 /</a>>
+            {% for folder in path %}
+        {#     当前路径       #}
+            <a href="{% url 'project_file' request.tracer.project.id%}?folder_id={{ folder.id }}">{{ folder.name }}</a>>/
+        {% endfor %}</div>
+        <div>
+            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal" style="vertical-align: middle;">上传</a>
+            <a class="btn btn-dark"  data-bs-toggle="modal" data-bs-target="#creatFolderModal" style="vertical-align: middle;">新建文件夹</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>大小</th>
+                    <th>更新者</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for f in files %}
+                <tr>
+                    <th>{% if f.file_type == 2 %}<a href="{% url 'project_file' request.tracer.project.id %}?folder_id={{ f.id }}">{{ f.name }}📂</a>{% else %}{{ f.name }}{% endif %}
+                    </th>
+                    <td>{% if f.file_type == 1 %}{{ f.file_size}}字节{% endif %}</td>
+                    <td>{{ f.update_user.username }}</td>
+                    <td>{{ f.update_datetime }}</td>
+                    <td>
+                        <button class = "deletebtn" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" fid="{{ f.id }}">🚮</button>
+                        {% if f.file_type == 1 %}<a href="{{ f.file_path }}">📥</a>{% endif %}
+                    </td>
+
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+      </div>
+</div>
+
+{#   上传文件弹窗     #}
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">上传文件</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id = 'upload-file' method="post" enctype="multipart/form-data" class="mb-4">
+            <div class="mb-3">
+                <label for="file" class="form-label">选择文件</label>
+                <input type="file" class="form-control" id="fileInput" name="file">
+            </div>
+            <button id="uploadBtn" type="button" class="btn btn-primary">上传</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{# 新建文件夹弹窗  #}
+<div class="modal fade" id="creatFolderModal" tabindex="-1" aria-labelledby="creatFolderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">新建文件夹</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id = 'folder-name'  method="post"  class="mb-4">
+            <div class="mb-3">
+                <label for="file" class="form-label">文件夹名</label>
+                <input type="text" class="form-control" id="FolderName" name="FolderName">
+            </div>
+            <button id="creatFolderBtn" type="button" class="btn btn-primary">新建</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 确认删除警告弹窗 -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">确认删除</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            确认要删除这个文件吗？所属文件也将被删除哦！！
+            <input type="hidden" id="file_id">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <!-- 确认删除按钮 -->
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确认删除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block JavaScript %}
+    <script>
+        $(function (){
+            uploadFile();
+            creatFolder();
+            delEvent();
+        });
+        function uploadFile()   {
+            $('#uploadBtn').click(function () {
+                // 获取文件输入框的文件
+                var file = document.getElementById('fileInput').files[0];
+                var path = '';
+                // 创建 FormData 对象，并将文件添加到其中
+                var formData = new FormData();
+                formData.append('file', file);
+                {% for folder in path %}
+                    path+='{{ folder.name }}/'
+                {% endfor %}
+                formData.append('path', path);
+                formData.append('file_type', 1);
+
+                $.ajax({
+                    url: '{% url 'project_file_upload' request.tracer.project.id %}?folder={{ folder_id }}',
+                    type: 'POST',
+                    processData: false, // 不对数据进行处理
+                    contentType: false, // 不设置 content-type
+                    data: formData, // 将文件数据作为 FormData 发送
+                    success: function (response) {
+                        console.log(response);
+                        // 处理成功的响应
+                        if (response.status) {
+                            location.reload(); // 重新加载页面
+                        } else {
+                            alert(response.msg)
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // 处理请求错误
+                        console.error('There was a problem with the upload:', error);
+                    }
+                });
+            })
+        }
+        function creatFolder() {
+            $('#creatFolderBtn').click(function () {
+                // 获取文件输入框的文件
+                var folder_name = document.getElementById('FolderName').value;
+                var path = '';
+                // 创建 FormData 对象，并将文件添加到其中
+                var formData = new FormData();
+                formData.append('file', folder_name);
+                {% for folder in path %}
+                    path+='{{ folder.name }}/'
+                {% endfor %}
+                formData.append('path', path);
+                formData.append('file_type', 2);
+
+                $.ajax({
+                    url: '{% url 'project_file_upload' request.tracer.project.id %}?folder={{ folder_id }}',
+                    type: 'POST',
+                    processData: false, // 不对数据进行处理
+                    contentType: false, // 不设置 content-type
+                    data: formData, // 将文件数据作为 FormData 发送
+                    success: function (response) {
+                        console.log(response);
+                        // 处理成功的响应
+                        if (response.status) {
+                            location.reload(); // 重新加载页面
+                        } else {
+                            alert(response.msg)
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // 处理请求错误
+                        console.error('There was a problem with the upload:', error);
+                    }
+                });
+            })
+        }
+        function delEvent(){
+            $(".deletebtn").click(function () {
+                var folder = $(this).attr('fid');
+                console.log(folder)
+                $('#file_id').val(folder);
+            });
+
+            $('#confirmDeleteBtn').click(function () {
+                // f_id
+                var file_id = $('#file_id').val();
+                var path = '';
+                // 创建 FormData 对象，并将文件添加到其中
+                var formData = new FormData();
+                {% for folder in path %}
+                    path+='{{ folder.name }}/'
+                {% endfor %}
+                formData.append('path', path);
+                formData.append('file_id', file_id);
+
+                $.ajax({
+                    url: '{% url 'project_file_delete' request.tracer.project.id %}?folder={{ folder_id }}',
+                    type: 'POST',
+                    processData: false, // 不对数据进行处理
+                    contentType: false, // 不设置 content-type
+                    data: formData, // 将文件数据作为 FormData 发送
+                    success: function (response) {
+                        console.log(response);
+                        // 处理成功的响应
+                        if (response.status) {
+                            location.reload(); // 重新加载页面
+                        } else {
+                            alert(response.msg)
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // 处理请求错误
+                        console.error('There was a problem with the upload:', error);
+                    }
+                });
+            })
+        }
+
+
+
+</script>
+{% endblock %}
