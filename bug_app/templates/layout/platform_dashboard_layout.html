@@ -26,7 +26,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">{{ request.tracer.project.name }}</a>
+            <a class="navbar-brand" href="{% url 'project_dashboard' request.tracer.project.id %}">{{ request.tracer.project.name }}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -52,7 +52,7 @@
                             <a class="nav-link" href="">统计</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" href="">设置</a>
+                            <a class="nav-link" href="{% url 'project_settings' request.tracer.project.id %}">设置</a>
                     </li>
                 </ul>
                 {#   右边             #}

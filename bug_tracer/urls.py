@@ -18,7 +18,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from bug_app.views import userAccount_views, index_views, project_views,wiki_view
+from bug_app.views import userAccount_views, index_views, project_views, wiki_view, fileRepository_view, \
+    project_setting_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -49,18 +50,24 @@ urlpatterns = [
     path('project/<int:project_id>/dashboard/', include(
         [
         path('', project_views.project_dashboard_view, name='project_dashboard'),
+            path('wiki/', include([
+                path('',wiki_view.project_wiki_list_view, name='project_wiki'),
+                path('add/',wiki_view.project_wiki_add_view, name='project_wiki_add'),
+                path('<int:wiki_id>/',wiki_view.project_wiki_detail_view, name='project_wiki_detail'),
+                path('<int:wiki_id>/del/',wiki_view.project_wiki_del_view, name='project_wiki_del'),
+                path('<int:wiki_id>/edit/',wiki_view.project_wiki_edit_view, name='project_wiki_edit'),
+            ])),
+            path('file/', include([
+                path('', fileRepository_view.fileRepository_list_view, name='project_file'),
+                path('upload/', fileRepository_view.fileRepository_upload_view, name='project_file_upload'),
+                path('del/', fileRepository_view.fileRepository_delete_view, name='project_file_delete')
+            ])),
+        path('settings/', project_setting_view.project_setting_view, name='project_settings'),
+        path('settings/del/', project_setting_view.project_setting_delete, name='project_settings_del'),
+        path('settings/edit/', project_setting_view.project_setting_edit, name='project_settings_edit'),
+
         # path('issues/', project_views.project_issues_view, name='project_issues'),
         # path('statistics/', project_views.project_statistics_view, name='project_statistics'),
-        # path('file/', project_views.project_file_view, name='project_file'),
-        path('wiki/', include([
-            path('',wiki_view.project_wiki_list_view, name='project_wiki'),
-            path('add/',wiki_view.project_wiki_add_view, name='project_wiki_add'),
-            path('<int:wiki_id>/',wiki_view.project_wiki_detail_view, name='project_wiki_detail'),
-            path('<int:wiki_id>/del/',wiki_view.project_wiki_del_view, name='project_wiki_del'),
-            path('<int:wiki_id>/edit/',wiki_view.project_wiki_edit_view, name='project_wiki_edit'),
-
-        ])),
-        # path('settings/', project_views.project_settings_view, name='project_settings'),
         ])
     ),
     path('mdeditor/', include(('mdeditor.urls', 'mdeditor'), namespace='mdeditor')), # 配置编辑器路由

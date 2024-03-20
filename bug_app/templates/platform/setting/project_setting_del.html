@@ -1,0 +1,90 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+
+{% block title %}
+    设置
+{% endblock %}
+
+{% block css %}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="card project">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div><a>⚙️设置</a>
+            </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {#   左边         #}
+            <div class="  col-md-3">
+                <div class="list-group" style="">
+                    <a href="{% url 'project_settings_edit' request.tracer.project.id %}" class="list-group-item">项目信息</a>
+                    <a href="{% url 'project_settings_del' request.tracer.project.id %}" class="list-group-item" style="background-color: #dc3545;color: white">删除项目</a>
+                </div>
+            </div>
+            {#   右边         #}
+            <div class="col-md-9">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div><a class="text-dark">删除项目</a></div>
+                    </div>
+                    <div class="card-body">
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="confirmName" class="form-label">请输入当前的项目名确认删除：</label>
+                                <input type="text" class="form-control" id="confirmName" name="confirm_name">
+                            </div>
+                            <button id ="deleteBtn"  type="button" class="btn btn-warning text-dark">确认</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block JavaScript %}
+
+<script>
+    $(function (){
+        deleteproject();
+    })
+    function deleteproject(){
+        $('#deleteBtn').click(function (){
+            console.log($('#confirmName').val())
+            $.ajax({
+                url:'{% url 'project_settings_del' request.tracer.project.id %}' , // 发送到的URL
+                type: 'POST', // 发送的请求类型为GET
+                dataType: 'json', // 预期返回的数据类型为JSON
+                data: {
+			        'confirm_name':$('#confirmName').val(),
+		            },
+                success: function (response){ // Ajax请求成功后的回调函数
+                    if (response.status){ // 如果返回的状态为成功
+                        alert('删除成功');
+                        window.location.href = "{% url 'project_list' %}";
+                    } else { // 如果返回的状态为失败
+                        alert(response.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // 请求失败时执行的操作
+                    console.error('Error:', error);
+                    // 在这里处理错误情况
+                }
+            });
+        });
+    }
+</script>
+{% endblock %}

@@ -23,6 +23,7 @@ class ConnectOss(object):
         try:
             bucket.delete_bucket()
         except Exception as e:
+            print(e)
             return e
         return bucket_name
     def storage_bucket(self, bucket_name):
@@ -165,9 +166,7 @@ if __name__ == '__main__':
     django.setup()
 
     co = ConnectOss()
-    print(co.delete_file("18382135936-f5b147bf75d54790805a65cd3addc321","fileRepository/测试/厕所/2024-03-20_00-38.png"))
-    # result = co.bucket_list()
-    # result = co.delete_bucket('123kjsvdsasd')
+    result = co.delete_bucket('18382135936-226dcca716fa481395a97642e596adac')
 
     # print(str(co.storage_bucket('123kjsvdsasd').storage_size_in_bytes/1024)+'KB')
 

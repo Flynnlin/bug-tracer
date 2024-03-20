@@ -1,0 +1,43 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+
+{% block title %}
+    设置
+{% endblock %}
+
+{% block css %}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="card project">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div><a>⚙️设置</a>
+            </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {#   左边         #}
+            <div class="  col-md-3">
+                <div class="list-group" style="">
+                    <a href="{% url 'project_settings_edit' request.tracer.project.id %}" class="list-group-item">项目信息</a>
+                    <a href="{% url 'project_settings_del' request.tracer.project.id %}" class="list-group-item" style="background-color: #dc3545;color: white">删除项目</a>
+                </div>
+            </div>
+            {#   右边         #}
+            <div class=" col-md-9">
+                <div class="card project">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div><a> </a>
+                    </div></div>
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
