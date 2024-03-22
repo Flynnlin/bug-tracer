@@ -88,7 +88,7 @@ def user_login_view(request):
                 'user_id': user_obj.id
             }
             request.session['user_info'] = user_info
-            request.session.set_expiry(7200)  # 设置超时时间
+            request.session.set_expiry(86400 * 3)  # 设置会话过期时间为一天（86400 秒）
             return redirect('/index/')
         else:
             print(userF.errors)

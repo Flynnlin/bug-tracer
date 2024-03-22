@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from bug_app.views import userAccount_views, index_views, project_views, wiki_view, fileRepository_view, \
-    project_setting_view
+    project_setting_view, issue_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -66,7 +66,10 @@ urlpatterns = [
         path('settings/del/', project_setting_view.project_setting_delete, name='project_settings_del'),
         path('settings/edit/', project_setting_view.project_setting_edit, name='project_settings_edit'),
 
-        # path('issues/', project_views.project_issues_view, name='project_issues'),
+        path('issues/', include([
+            path('', issue_view.issue_view, name='issue'),
+            path("add/", issue_view.issue_add_view, name='issue_add'),
+        ])),
         # path('statistics/', project_views.project_statistics_view, name='project_statistics'),
         ])
     ),

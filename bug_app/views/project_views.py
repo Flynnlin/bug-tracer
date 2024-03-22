@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from bug_app.forms.project_form import ProjectModelform
-from bug_app.models import Project, ProjectUser
+from bug_app.models import Project, ProjectUser, IssuesType
 from bug_app.utils import oss, uuidStr
 
 """
@@ -31,7 +31,12 @@ def project_list_view(request):
             form.instance.bucket=bucketName
             form.instance.region="chengdu"
             form.instance.creator=current_user
-            form.save()
+            instance =form.save()
+
+            # 初始化项目默认问题类型、
+            for i in IssuesType.PROJECT_INIT_LIST:
+                IssuesType.objects.create(project=instance,title=i)
+
 
             rep_msg['status'] = True
         else:

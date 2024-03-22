@@ -17,14 +17,13 @@
         min-height: 300px;
     }
     </style>
-    {% block css %}{% endblock %}
-
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-5.3.2/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'plugins/fontawesome/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.css' %}"  />
+{% block css %}{% endblock %}
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg " style="background-color: {{ request.tracer.project.get_color_display }}">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'project_dashboard' request.tracer.project.id %}">{{ request.tracer.project.name }}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +39,7 @@
                             <a class="nav-link" href="{% url 'project_dashboard' request.tracer.project.id %}">概览</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" href="">问题</a>
+                            <a class="nav-link" href="{% url 'issue' request.tracer.project.id %}">问题</a>
                     </li>
                     <li class="nav-item">
                             <a class="nav-link" href="{% url 'project_file' request.tracer.project.id %}">文件</a>
@@ -92,9 +91,17 @@
 <!-- 导入 Bootstrap JavaScript 文件 -->
 
 <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
-<script src="{% static 'plugins/bootstrap-5.3.2/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'plugins/bootstrap-5.3.2/js/bootstrap.bundle.min.js' %}"></script>
-
+<script src="{% static 'plugins/select2/select2.js' %}"></script>
+<script>  $(document).ready(function () {//加载页面时执行select2
+    $('.singleSelect').select2({
+        language: {
+      noResults: function(params) {
+          return "未找到该数据";
+      }
+ }
+ });
+  });</script>
 {%  block JavaScript %} {% endblock %}
 </body>
 </html>

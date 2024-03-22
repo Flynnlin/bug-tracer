@@ -11,8 +11,8 @@ class BootstrapModelForm(forms.ModelForm):
         #循环找到所有的字段，并将他们的插件添加class
         for name,field in self.fields.items():
             if field.widget.attrs:
-                field.widget.attrs['class'] = 'form-control'
-                field.widget.attrs['placeholder'] ='请输入 %s' % (field.label,)
+                if not field.widget.attrs.get('class'):
+                    field.widget.attrs = {'class':'form-control'}
             else:
                 field.widget.attrs = {'class':'form-control'}
 class BootstrapForm(forms.Form):
@@ -23,7 +23,7 @@ class BootstrapForm(forms.Form):
         #循环找到所有的字段，并将他们的插件添加class
         for name,field in self.fields.items():
             if field.widget.attrs:
-                field.widget.attrs['class'] = 'form-control'
-                field.widget.attrs['placeholder'] = '请输入 %s' % (field.label,)
+                if not field.widget.attrs.get('class'):
+                    field.widget.attrs = {'class':'form-control'}
             else:
                 field.widget.attrs = {'class':'form-control'}

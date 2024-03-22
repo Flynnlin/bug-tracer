@@ -133,10 +133,10 @@ class Issues(models.Model):
     """ 问题 """
     project = models.ForeignKey(verbose_name='项目', to='Project', on_delete=models.CASCADE)
     issues_type = models.ForeignKey(verbose_name='问题类型', to='IssuesType', on_delete=models.CASCADE)
-    module = models.ForeignKey(verbose_name='模块', to='Module', null=True, blank=True, on_delete=models.CASCADE)
+    module = models.ForeignKey(verbose_name='项目阶段-里程碑', to='Module', null=True, blank=True, on_delete=models.CASCADE)
 
     subject = models.CharField(verbose_name='主题', max_length=80)
-    desc = models.TextField(verbose_name='问题描述')
+    desc = MDTextField(verbose_name='问题描述')
     priority_choices = (
         ("danger", "高"),
         ("warning", "中"),
@@ -162,8 +162,8 @@ class Issues(models.Model):
     start_date = models.DateField(verbose_name='开始时间', null=True, blank=True)
     end_date = models.DateField(verbose_name='结束时间', null=True, blank=True)
     mode_choices = (
-        (1, '公开模式'),
-        (2, '隐私模式'),
+        (1, '公开'),
+        (2, '隐私'),
     )
     mode = models.SmallIntegerField(verbose_name='模式', choices=mode_choices, default=1)
 
@@ -181,6 +181,7 @@ class Issues(models.Model):
 
 class Module(models.Model):
     """ 模块（里程碑）"""
+    # 即项目阶段，第一期、二期、第几个模块
     project = models.ForeignKey(verbose_name='项目', to='Project', on_delete=models.CASCADE)
     title = models.CharField(verbose_name='模块名称', max_length=32)
 

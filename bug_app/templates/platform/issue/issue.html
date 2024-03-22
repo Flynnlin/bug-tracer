@@ -1,0 +1,133 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}
+    设置
+{% endblock %}
+
+{% block css %}
+     <link rel="stylesheet" href="{% static 'plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+    <style>
+        .issues-list .number {
+            width: 100px;
+            text-align: right;
+        }
+        .issues-list .number a {
+            font-weight: 500;
+            padding: 0 10px;
+        }
+        .issues-list .issue .tags {
+            padding: 10px 0;
+        }
+        .issues-list .issue .tags span{
+            margin-right: 20px;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .issues-list .issue .tags .type{
+            color:white;
+            padding: 1px 5px;
+            border-radius: 5px;
+        }
+                /* 筛选 */
+        .filter-area .item {
+            margin-bottom: 15px;
+        }
+
+        .filter-area .item .title {
+            padding: 5px 0;
+        }
+
+        .filter-area .item .check-list a {
+            text-decoration: none;
+            display: inline-block;
+            min-width: 65px;
+        }
+
+        .filter-area .item .check-list label {
+            font-weight: 200;
+            font-size: 13px;
+            margin-left: 3px;
+        }
+
+        .filter-area .item .check-list a:hover {
+            font-weight: 300;
+        }
+
+        .filter-area .item .check-list .cell {
+            margin-right: 10px;
+        }
+    </style>
+
+{% endblock %}
+
+{% block body %}
+    <div class="row" >
+        <div class="  col-md-3">
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>🔍筛选</a>
+                        </div>
+                </div>
+                <div class="card-body">
+                    <hr>
+
+                </div>
+            </div>
+        </div>
+        {#   右边         #}
+        <div class=" col-md-8">
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>❓问题</a>
+                        </div>
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary" href="{% url 'issue_add' request.tracer.project.id %}" style="vertical-align: middle;">新建问题</a>
+                    <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#creatIssueModal" style="vertical-align: middle;">删除项目</a>
+                    <hr>
+            {#          循环部分          #}
+                    {% for i in issues %}
+                    <table class="table">
+                        <tbody class="issues-list">
+                            <tr>
+                                <td class="number">
+                                    c
+                                    <a href="http://localhost:8080" target="_blank">#00</a>
+                                </td>
+                                <td class="issue">
+                                    <div>
+                                        <a target="_blank">{{ i.subject }}</a>
+                                    </div>
+                                    <div class="tags">
+                                        <span class="type" style="background-color: #842029">
+                                            {{ i.issues_type }}
+                                        </span>
+                                        <span>
+                                            🔄{{ i.get_status_display }}
+                                        </span>
+                                        <span>
+                                            👤{{ i.creator }}
+                                        </span>
+                                        <span>
+                                            🕒{{ i.latest_update_datetime }}更新
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+                <div class="card-footer">
+                    {{ page_string|safe }}{#   分页  #}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block JavaScript %}
+
+
+{% endblock %}
