@@ -171,10 +171,10 @@ function creatIssue(){
                 success: function (res){
                     console.log(res);
                     // 清空所有错误信息
-                    $(".alert-light").empty();
+                    $(".error-msg").empty();
                     // 根据返回的状态处理响应结果
                     if(res.status){
-                        location.reload(); // 重新加载页面
+                        window.location.href = "{% url 'issue' request.tracer.project.id %}";
                     }else{
                         // 循环遍历错误信息，并将错误信息显示在相应的表单字段下方
                         $.each(res.Error,function (name,value){
