@@ -69,14 +69,23 @@
                     <div><a>🔍筛选</a>
                         </div>
                 </div>
-                <div class="card-body">
-                    <hr>
+                <div class="card-body filter-area">
+                    {% for row in filter_list %}
+                        <div class="item">
+                            <div class="title">{{ row.title }}</div>
+                            <div class="check-list">
+                                {% for item in row.filter %}
+                                    {{ item }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
 
                 </div>
             </div>
         </div>
         {#   右边         #}
-        <div class=" col-md-8">
+        <div class=" col-md-9">
             <div class="card project">
                 <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div><a>❓问题</a>
@@ -88,19 +97,19 @@
                     <hr>
             {#          循环部分          #}
                     {% for i in issues %}
-                    <table class="table">
+                        <table class="table">
                         <tbody class="issues-list">
                             <tr>
                                 <td class="number">
-                                    c
-                                    <a href="http://localhost:8080" target="_blank">#00</a>
+                                    <span class="text-{{ i.priority }}" style="display: inline-block;border-radius:70%;font-size: 30px">●</span>
+                                    <a target="_blank" href="{% url 'issue_detail' request.tracer.project.id i.id %}">#0{{ i.id }}</a>
                                 </td>
                                 <td class="issue">
                                     <div>
-                                        <a target="_blank">{{ i.subject }}</a>
+                                        <a target="_blank" href="{% url 'issue_detail' request.tracer.project.id i.id %}">{{ i.subject }}</a>
                                     </div>
                                     <div class="tags">
-                                        <span class="type" style="background-color: #842029">
+                                        <span class="type" style="display: inline-block; padding: 5px; background-color: white; color: black; border: 1px solid black;">
                                             {{ i.issues_type }}
                                         </span>
                                         <span>
@@ -109,6 +118,17 @@
                                         <span>
                                             👤{{ i.creator }}
                                         </span>
+                                        {% if i.assign %}
+                                        	<span>
+                                            👉{{ i.assign }}
+                                            </span>
+                                        {% endif %}
+
+                                        {% if i.end_date %}
+                                        	<span>
+                                            🕒{{ i.end_date }}截至
+                                            </span>
+                                        {% endif %}
                                         <span>
                                             🕒{{ i.latest_update_datetime }}更新
                                         </span>
@@ -117,8 +137,10 @@
                             </tr>
                         </tbody>
                     </table>
+                    {% endfor %}
+
                 </div>
-                {% endfor %}
+
                 <div class="card-footer">
                     {{ page_string|safe }}{#   分页  #}
                 </div>

@@ -15,7 +15,6 @@ class IssuesForm(BootstrapModelForm):
             "attention":forms.SelectMultiple(attrs={'class':'form-control singleSelect'}),
             "parent":forms.Select(attrs={'class':'form-control singleSelect'}),
         }
-
     def __init__(self, *args, **kwargs):
         super(IssuesForm, self).__init__(*args, **kwargs)
         #1.指派者和关注者必须是本项目的人
@@ -30,8 +29,6 @@ class IssuesForm(BootstrapModelForm):
         self.fields['mode'].queryset = Module.objects.filter(project=self.request.tracer.project)
         #4 .项目类型也是当前项目的
         self.fields['issues_type'].queryset = IssuesType.objects.filter(project=self.request.tracer.project)
-
-
 
 class IssuesReplyModelForm(BootstrapModelForm):
     class Meta:

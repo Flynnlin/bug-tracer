@@ -69,7 +69,90 @@
                 <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div><a>更新问题</a></div>
                 </div>
+                <div class="card-body">
+                <form id="editForm" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <label for="{{ form.issues_type.id_for_label }}" class="form-label">{{ form.issues_type.label }}</label>
+                        {{ form.issues_type }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
+                        {{ form.subject }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="{{ form.module.id_for_label }}" class="form-label">{{ form.module.label }}</label>
+                        {{ form.module }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row" style="padding-bottom: 5px">
+                            <div class="col-md-6">
+                            <label for="{{ form.desc.id_for_label }}" class="form-label">{{ form.desc.label }}</label>
+                            </div>
+                            <div class="col-md-6" style="text-align: right">
+                            <a type="button" class="btn btn-primary"  id="saveDesc">保存</a>
+                            </div>
+                        </div>
+                        <div id="editor">
+                            {{ form.media }}
+                            {{ form.desc }}
+                        </div>
+                        <div class="error-msg"></div>
 
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                        {{ form.status }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.priority.id_for_label }}" class="form-label">{{ form.priority.label }}</label>
+                        {{ form.priority }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.assign.id_for_label }}" class="form-label">指派给</label>
+
+                        {{ form.assign }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.attention.id_for_label }}" class="form-label">关注者</label>
+                        {{ form.attention }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.start_date.id_for_label }}" class="form-label">开始时间</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📅</span>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.end_date.id_for_label }}" class="form-label">截止时间</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📅</span>
+                            {{ form.end_date }}
+                        </div>
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.mode.id_for_label }}" class="form-label">模式</label>
+                        {{ form.mode }}
+                        <div class="error-msg"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.parent.id_for_label }}" class="form-label">父问题</label>
+                        {{ form.parent }}
+                        <div class="error-msg"></div>
+                    </div>
+                </form>
+                </div>
                 <div class="card-footer">
                 </div>
             </div>
@@ -123,7 +206,8 @@
     </div>
 </div>
 
-
+{#<!-- 添加一个 Toast 容器 来弹出通知-->#}
+<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3 text-info"></div>
 {% endblock %}
 
 {% block JavaScript %}
@@ -138,6 +222,8 @@ $(function (){
     bindReply();
     bindCancelReplyUser();
     bindSubmit();
+    bindChangeIssues();
+    saveDesc();
 });
 {#初始化时间组件#}
 function initdate(){
@@ -148,6 +234,7 @@ function initdate(){
         autoClose:true
     })
 }
+
 {#获取操作记录#}
 function initIssuesRecord() {
             $.ajax({
@@ -225,6 +312,76 @@ function bindSubmit() {
 
 }
 
+{# 监测是否值发生变化 #}
+function bindChangeIssues() {
+    $('#editForm').find('.form-control').change(function () {
+        // 内容变更
+        var postDict = {name: $(this).attr('name'), value: $(this).val()};
+        postAjaxData(postDict);
+    });
+}
+
+{# 手动按钮保存问题描述 #}
+function saveDesc() {
+    $("#saveDesc").click(function (){
+        var postDict = {name: 'desc', value: document.getElementById('id_desc').value};
+        postAjaxData(postDict);
+    });
+}
+{# 推送更新记录 #}
+function postAjaxData(postDict) {
+    $('#id_' + postDict.name).parent().next('.error-msg').text("");
+    $.ajax({
+        url: '{% url 'issue_detail' request.tracer.project.id issue.id %}',
+        type: "POST",
+        header: {
+            "Content-Type": "application/json;charset=utf-8"
+        },
+        data: JSON.stringify(postDict),
+        dataType: "JSON",
+        success: function (res) {
+            if (res.status) {
+                {# 如果数据更新成功，同时会返回操作记录 #}
+                createRecordNode(res.data);
+                showToast("通知",postDict.name+"更新了");
+            } else {
+                showToast("错误",postDict.name+"："+res.error);
+                $('#id_' + postDict.name).next('.error-msg').text(res.error);
+            }
+        }
+    })
+}
+function showToast(title, content) {
+        // 创建 Toast 元素
+        var toastElement = document.createElement('div');
+        toastElement.classList.add('toast');
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+
+        // 添加 Toast 标题和内容
+        toastElement.innerHTML = `
+            <div class="toast-header">
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${content}
+            </div>
+        `;
+
+        // 添加到 Toast 容器中
+        document.getElementById('toastContainer').appendChild(toastElement);
+
+        // 创建一个 Bootstrap Toast 实例并显示
+        var toast = new bootstrap.Toast(toastElement);
+        toast.show();
+
+        // Toast 消失后移除 Toast 元素
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
 </script>
 
 {% endblock %}
