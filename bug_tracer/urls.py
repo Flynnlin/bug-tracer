@@ -69,6 +69,9 @@ urlpatterns = [
         path('issues/', include([
             path('', issue_view.issue_view, name='issue'),
             path("add/", issue_view.issue_add_view, name='issue_add'),
+            path("<int:issue_id>/",issue_view.issue_edit_view, name='issue_detail'),
+            path("<int:issue_id>/getReply/",issue_view.issue_get_reply_view, name='issue_get_reply'),
+
         ])),
         # path('statistics/', project_views.project_statistics_view, name='project_statistics'),
         ])

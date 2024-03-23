@@ -1,0 +1,230 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+{% load static %}
+
+{% block title %}
+    设置
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+    <style>
+        .comment-list .item {
+            margin-top: 20px;
+        }
+
+        .comment-list .left-avatar {
+            float: left;
+            margin-right: 10px;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #304659;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+        }
+        .comment-list pre {
+            max-height: 35px;
+            border: 1px solid #ccc;
+            padding: 10px;
+
+        }
+        .comment-list .right-info {
+            padding-left: 35px;
+        }
+
+        .comment-list .right-info .desc .msg {
+            display: inline-block;
+            padding-right: 20px;
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+
+        .comment-list .child {
+            padding-left: 55px;
+        }
+
+        .error-msg {
+            color: red;
+        }
+
+        .comment-text .reply-user {
+            display: inline-block;
+            background-color: #ddd;
+            color: black;
+            padding: 6px 8px;
+            margin-left: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="row" >
+{#  左  #}
+        <div class=" col-md-8">
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>更新问题</a></div>
+                </div>
+
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+{#  右      #}
+        <div class=" col-md-4">
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><h1 class="modal-title">历史记录</h1>
+                        </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="comment-list">
+            {#  填充 历史记录 #}
+                    </div>
+                    <hr>
+                    <div class="comment-text" id="commentText">
+                        <div class="form-group" style="padding-bottom: 15px">
+                            <textarea id="content" rows="6" class="form-control"
+                                      placeholder="请输入要回复的内容"></textarea>
+                            <span class="error-msg"></span>
+                        </div>
+                        <input class="btn btn-primary" type="button" id="btnSubmit" value="提 交">
+                        <div class="reply-user d-none" id="replyUser">
+                            💬回复: <span></span>❌
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{#  历史记录模板  #}
+<div class=" d-none" id="recordTemplate">
+    <div class="item clearfix">
+        <div class="left-avatar"></div>
+        <div class="right-info">
+            <pre></pre>
+            <div class="desc">
+                <div class="msg">
+                    ⚙️<span class="type"></span>
+                    👤<span class="user"></span>
+                    🕒<span class="date"></span>
+                    <a href="#commentText" class="reply">💬回复</a>
+                </div>
+            </div>
+        </div>
+        <div class="child">
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block JavaScript %}
+<script src="{% static 'plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js' %}"></script>
+<script>
+
+
+$(function (){
+    initdate();
+    initIssuesRecord();
+    bindReply();
+    bindCancelReplyUser();
+    bindSubmit();
+});
+{#初始化时间组件#}
+function initdate(){
+    $('#id_start_date,#id_end_date').datepicker({
+        format:'yyyy-mm-dd',
+        startDate:'0',
+        language:"zh-CN",
+        autoClose:true
+    })
+}
+{#获取操作记录#}
+function initIssuesRecord() {
+            $.ajax({
+                url: '{% url 'issue_get_reply' request.tracer.project.id issue.id %}',
+                type: "GET",
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            createRecordNode(item);
+                        })
+                    } else {
+                    }
+                }
+            })
+        }
+{#创建操作记录节点#}
+function createRecordNode(nodeDict) {
+    var $item = $("#recordTemplate").find('.item').clone();
+    $item.find('.left-avatar').html(nodeDict.creator.toUpperCase());
+    $item.find('pre').html(nodeDict.content);
+    $item.find('.user').html(nodeDict.creator);
+    $item.find('.type').html(nodeDict.reply_type_text);
+    $item.find('.date').html(nodeDict.datetime);
+    $item.attr({id: nodeDict.id, username: nodeDict.creator});
+
+    if (nodeDict.parent_id) {
+        // 挂在谁下
+        $('#' + nodeDict.parent_id).children('.child').append($item);
+    } else {
+        // 根下
+        $('.comment-list').append($item);
+    }
+}
+{#回复指定#}
+function bindReply() {
+    $('.comment-list').on('click', '.reply', function () {
+        var $item = $(this).parent().parent().parent().parent();
+        var id = $item.attr('id');
+        var username = $item.attr('username');
+        $('#replyUser').removeClass('d-none').attr('parent-id', id).children('span').text(username);
+    })
+}
+{#取消回复指定#}
+function bindCancelReplyUser() {
+    $('#replyUser').click(function () {
+        $(this).addClass('d-none').removeAttr('parent-id').children('span').text("");
+    })
+}
+{# 进行评论  #}
+function bindSubmit() {
+    $('#btnSubmit').click(function () {
+        $("#commentText .error-msg").text("");
+        $.ajax({
+            url: '{% url 'issue_get_reply' request.tracer.project.id issue.id %}',
+            type: "POST",
+            data: {content: $('#content').val(), reply: $("#replyUser").attr('parent-id')},
+            dataType: "JSON",
+            success: function (res) {
+                console.log(res)
+                if (res.status) {
+                    // 添加节点
+                    createRecordNode(res.data);
+                    // 输入的内容清空
+                    $('#content').val('');
+                    $('#replyUser').addClass('d-none').removeAttr('parent-id').children('span').text("");
+                } else {
+                    $.each(res.error, function (k, v) {
+                        $('#content').next('.error-msg').text(v[0]);
+                    })
+                }
+            }
+        })
+    })
+
+}
+
+</script>
+
+{% endblock %}

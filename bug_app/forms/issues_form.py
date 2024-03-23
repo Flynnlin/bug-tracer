@@ -2,7 +2,7 @@ from django import forms
 
 
 from bug_app.forms.BootStrapForm import BootstrapModelForm
-from bug_app.models import Issues, UserInfo, Module, IssuesType, ProjectUser, Project
+from bug_app.models import Issues, UserInfo, Module, IssuesType, ProjectUser, Project, IssuesReply
 
 
 class IssuesForm(BootstrapModelForm):
@@ -30,3 +30,10 @@ class IssuesForm(BootstrapModelForm):
         self.fields['mode'].queryset = Module.objects.filter(project=self.request.tracer.project)
         #4 .项目类型也是当前项目的
         self.fields['issues_type'].queryset = IssuesType.objects.filter(project=self.request.tracer.project)
+
+
+
+class IssuesReplyModelForm(BootstrapModelForm):
+    class Meta:
+        model = IssuesReply
+        fields = ['content', 'reply']
