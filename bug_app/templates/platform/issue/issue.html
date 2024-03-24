@@ -29,7 +29,7 @@
             padding: 1px 5px;
             border-radius: 5px;
         }
-                /* 筛选 */
+        /* 筛选 */
         .filter-area .item {
             margin-bottom: 15px;
         }
@@ -70,16 +70,21 @@
                         </div>
                 </div>
                 <div class="card-body filter-area">
-                    {% for row in filter_list %}
+                    {% for filter in filter_list %}
                         <div class="item">
-                            <div class="title">{{ row.title }}</div>
+                            <div class="title">{{ filter.title }}</div>
                             <div class="check-list">
-                                {% for item in row.filter %}
-                                    {{ item }}
+                                {% for row in filter.filter %}
+                                    {{ row }}
                                 {% endfor %}
                             </div>
                         </div>
                     {% endfor %}
+                    <hr>
+                <div style="padding: 5px">
+                    <a class="btn btn-primary" style="padding: 5px" href="?assign={{ request.tracer.user.id }}">指派给我的</a>
+                    <a class="btn btn-primary" style="padding: 5px" href="?attention={{ request.tracer.user.id }}">关于我的</a>
+                </div>
 
                 </div>
             </div>
@@ -93,7 +98,6 @@
                 </div>
                 <div class="card-body">
                     <a class="btn btn-primary" href="{% url 'issue_add' request.tracer.project.id %}" style="vertical-align: middle;">新建问题</a>
-                    <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#creatIssueModal" style="vertical-align: middle;">删除项目</a>
                     <hr>
             {#          循环部分          #}
                     {% for i in issues %}
@@ -150,6 +154,46 @@
 {% endblock %}
 
 {% block JavaScript %}
-
+    <script src="{% static 'plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js' %}"></script>
+    <script>
+    $(function (){
+        redirectToSelectedOption();
+        initdate();
+        DateChange();
+    })
+    function redirectToSelectedOption() {
+        $('.singleSelect').select2({}).on('select2:select', function (e) {
+            // 选中某一项触发
+            location.href = e.params.data.id;
+        }).on('select2:unselect', function (e) {
+            // 移除某一项触发
+            location.href = e.params.data.id;
+        });
+    }
+    {#初始化时间组件#}
+    function initdate(){
+        $('#id_start_date,#id_end_date').datepicker({
+            format:'yyyy-mm-dd',
+            {#startDate:'0',#}
+            language:"zh-CN",
+            autoClose:true
+        })
+    }
+    function DateChange(){
+        $('#id_start_date, #id_end_date').change(function() {
+        var start_date_value = $('#id_start_date').val();
+        var end_date_value = $('#id_end_date').val();
+        url="?"
+        if(start_date_value){
+            url+="start_date="+start_date_value;
+        }
+        if(end_date_value){
+            url+="&end_date="+end_date_value
+        }
+        location.href=url;
+        });
+    }
+</script>
 
 {% endblock %}
