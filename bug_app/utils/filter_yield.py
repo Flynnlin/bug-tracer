@@ -84,7 +84,27 @@ class CheckFilter(object):
 
 
 class SelectFilter(object):
+    """
+    SelectFilter类用于生成下拉框过滤器的HTML代码。
+
+    Attributes:
+        name (str): 过滤器的名称。
+        data_list (list): 包含键值对的列表，用于生成每个选项的文本和值。
+        request (HttpRequest): 当前请求对象，用于获取URL参数。
+
+    Methods:
+        __init__(self, name, data_list, request): 初始化SelectFilter对象。
+        __iter__(self): 生成器方法，用于生成每个选项的HTML代码。
+    """
     def __init__(self, name, data_list, request):
+        """
+                初始化SelectFilter对象。
+
+                Args:
+                    name (str): 过滤器的名称。
+                    data_list (list): 包含键值对的列表，用于生成每个选项的文本和值。
+                    request (HttpRequest): 当前请求对象，用于获取URL参数。
+                """
         self.name = name
         self.data_list = data_list
         self.request = request
@@ -95,18 +115,32 @@ class SelectFilter(object):
             key = str(item[0])
             text = item[1]
 
-            selected = ""
+            selected = "" # 选中标记
+
+            # 一样的步骤，获取所有当前字段选中的值
+            # 再判断当前处理值是否被选中
+            # 如果被选中，则将值剔除，没有则加上
             value_list = self.request.GET.getlist(self.name)
             if key in value_list:
                 selected = 'selected'
                 value_list.remove(key)
             else:
                 value_list.append(key)
+            # value_list：此时两种情况
+            ## 如果当前值是被选择状态，则value_list中就是除去当前值后的所有被选中值
+            ## 如果当前值没有被选中，则value_list中就是所有已选中值再加上当前值
 
+            # 生成URL参数
+            # 获取所有字段当前筛选条件
             query_dict = self.request.GET.copy()
             query_dict._mutable = True
+            # 更新当前字段的筛选条件
+            # 将当前筛选条件字段名和更新后的value_list放进去
+            # 达到的效果是如果当前值已经被选中，则点击生成后的url就是取消当前值选中
+            # 如果当前值没有被选中，则点击后就是在当前筛选条件上增加字节的筛选条件
             query_dict.setlist(self.name, value_list)
 
+            # 移除可能存在的页码参数、即置为第一页
             if 'page' in query_dict:
                 query_dict.pop('page')
 
