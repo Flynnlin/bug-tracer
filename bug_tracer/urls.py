@@ -43,6 +43,7 @@ urlpatterns = [
 
     #系统页面
     path('project/list/', project_views.project_list_view, name='project_list'),
+    path('project/join/<int:code>/',project_setting_view.invite_join, name='invite_join'),
     # 区分 project/star/my/1  project/star/join/1
     path('project/star/<str:project_type>/<int:project_id>/', project_views.project_star_view, name='project_star'),
 
@@ -65,6 +66,7 @@ urlpatterns = [
         path('settings/', project_setting_view.project_setting_view, name='project_settings'),
         path('settings/del/', project_setting_view.project_setting_delete, name='project_settings_del'),
         path('settings/edit/', project_setting_view.project_setting_edit, name='project_settings_edit'),
+        path('settings/invite/', project_setting_view.project_invite_view, name='project_invite'),
 
         path('issues/', include([
             path('', issue_view.issue_view, name='issue'),
