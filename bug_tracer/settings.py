@@ -134,8 +134,8 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
-
-USE_TZ = True
+# 影响数据库时间字段，如果为true则会加入时区
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
