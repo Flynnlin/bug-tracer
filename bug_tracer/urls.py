@@ -74,7 +74,6 @@ urlpatterns = [
             path("add/", issue_view.issue_add_view, name='issue_add'),
             path("<int:issue_id>/",issue_view.issue_edit_view, name='issue_detail'),
             path("<int:issue_id>/getReply/",issue_view.issue_get_reply_view, name='issue_get_reply'),
-
         ])),
         path('statistics/', statistics_views.statistic_view, name='project_statistics'),
         ])

@@ -1,0 +1,86 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+{% load static %}
+{% block css  %}
+<link rel="stylesheet" type="text/css" href="{% static 'plugins/daterangepicker/daterangepicker.css' %}"/>
+{% endblock %}
+
+{% block body %}
+
+<div class="input-group" style="padding: 5px;width: 300px">
+    <span class="input-group-text">📅</span>
+    <input type="text" class="form-control" id="range_date">
+</div>
+
+<div class="row">
+    <div  class="col-md-7">
+        <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div></div>
+                </div>
+                <div class="card-body">
+
+
+                </div>
+            <div  class="card-footer" ></div>
+        </div>
+    </div>
+    <div  class="col-md-5">
+        <div class="card project">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div></div>
+            </div>
+            <div class="card-body">
+
+            </div>
+            <div  class="card-footer" >
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block JavaScript %}
+<script type="text/javascript" src="{% static 'plugins/daterangepicker/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+
+<script>
+$(function() {
+    initdate();
+});
+function initdate(){
+    var options = {
+        maxDate : moment(),
+        alwaysShowCalendars:true,
+        showWeekNumbers:true,
+        ranges: {
+            '今天': [moment(), moment()],
+            '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            '最近7天': [moment().subtract(6, 'days'), moment()],
+            '最近30天': [moment().subtract(29, 'days'), moment()],
+            '本月': [moment().startOf('month'), moment().endOf('month')]
+        },
+        locale: {
+            format: 'YYYY-MM-DD',
+            separator: ' 至 ',
+            applyLabel: '确定',
+            cancelLabel: '取消',
+            fromLabel: '开始',
+            toLabel: '结束',
+            customRangeLabel: '自定义',
+            weekLabel: 'W',
+            daysOfWeek: ['一', '二', '三', '四', '五', '六', '日'],
+            monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            firstDay: 1
+        }
+    }
+    $('#range_date').daterangepicker(options, function(start, end, label) {
+    console.log("选择了一个新的日期: "+start.format('YYYY-MM-DD')+' to '+end.add(1,'days').format('YYYY-MM-DD'));
+     });
+}
+
+</script>
+{% endblock %}
+
+
+
