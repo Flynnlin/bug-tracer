@@ -1,10 +1,290 @@
 {% extends 'layout/platform_dashboard_layout.html' %}
-
+{% load static %}
 {% block title %}
     项目面板
 {% endblock %}
+{% block css %}
+<script src="{% static 'plugins/highcharts/highcharts.js' %}"></script>
 
+<style>
+    .status-count {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+    .status-count .count {
+        font-size: 15px;
+    }
+
+    .status-count a {
+        text-decoration: none;
+    }
+    .avatar {
+            float: left;
+            margin-right: 10px;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #304659;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+        }
+    .comment-list .item {
+            margin-top: 20px;
+        }
+
+    .comment-list .left-avatar {
+        float: left;
+        margin-right: 10px;
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        background-color: #304659;
+        color: white;
+        text-align: center;
+        line-height: 30px;
+        border-radius: 50%;
+    }
+    .comment-list pre {
+        max-height: 35px;
+        border: 1px solid #ccc;
+        padding: 10px;
+
+    }
+    .comment-list .right-info {
+        padding-left: 35px;
+    }
+
+    .comment-list .right-info .desc .msg {
+        display: inline-block;
+        padding-right: 20px;
+        color: #8c8c8c;
+        font-size: 12px;
+    }
+    .comment-list .child {
+        padding-left: 55px;
+    }
+</style>
+{% endblock %}
 {% block body %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="col-md-12">
+{#展示问题趋势#}
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>新增问题趋势</a></div>
+                </div>
+                <div class="card-body">
+                    <div id="container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+    {#展示问题概览#}
+                <div class="card project">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div><a>问题概览</a></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for key,item in status_dict.items %}
+                                <div class="col-md-4 col-sm-6">
+                                <div class="status-count">
+                                    <a href="{% url 'issue' project_id=request.tracer.project.id %}?status={{ key }}">
+                                        <div class="count">{{ item.count }}</div>
+                                        <div>{{ item.text }}</div>
+                                    </a>
+                                </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+{# 展示项目成员#}
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>成员</a></div>
+                </div>
+                <div class="card-body">
+                    <div class="col-sm-12 title">创建者</div>
+                    <div class="clearfix" style="margin-bottom: 30px;">
+                        <div class="col-sm-4">
+                            <div class="avatar">{{ request.tracer.project.creator.username.0|upper }}</div>
+                            <div class="text">{{ request.tracer.project.creator.username }}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 title">参与者</div>
+                    <div>
+                        {% for item in user_list %}
+                            <div class="col-sm-4">
+                                <div class="avatar">{{ item.user.username.0|upper }}</div>
+                                <div class="text">{{ item.user.username }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+{#左右划分#}
+    <div class="col-md-4">
+        <div class="col-md-12">
+{#展示项目状态信息#}
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>项目状态</a></div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-right">
+                            <tbody>
+                            <tr>
+                                <td class="label-left">项目名称 ：</td>
+                                <td>{{ request.tracer.project.name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-left">项目描述 ：</td>
+                                <td>{{ request.tracer.project.desc }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-left">创建时间 ：</td>
+                                <td>{{ request.tracer.project.create_datetime }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-left">项目空间 ：</td>
+                                <td> {{ storage }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+{# 展示项目动态#}
+            <div class="card project">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><a>项目动态</a></div>
+                </div>
+                <div class="card-body comment-list">
+                    {% for i in last_reply %}
+                    <div class="item clearfix" id="{{ i.id }}" username="{{ i.creator }}">
+                        <div class="left-avatar">{{ i.creator }}</div>
+                        <div class="right-info">
+                            <pre>{{ i.content }}</pre>
+                            <div class="desc">
+                                <div class="msg">
+                                    ⚙️<span class="type">{{ i.get_reply_type_display }}</span>
+                                    👤<span class="user">{{ i.creator }}</span>
+                                    🕒<span class="date">{{ i.create_datetime }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="child">
+                        </div>
+                    </div>
+                    {%  endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 
+</div>
+
+
+{% endblock %}
+
+{% block JavaScript %}
+<script>
+
+    $(function (){
+       initTestChart();
+    });
+    function initTestChart(){
+        Highcharts.setOptions({
+        global: {
+            useUTC: false
+            }
+        });
+        var config = {
+                title: {
+                    text: null   // 不显示标题
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                },
+                credits: {
+                    enabled: false // 关闭版权信息
+                },
+                yAxis: {
+                    title: {
+                        text: '数量' // Y周文本提示
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickInterval: 60 * 60 * 24 * 1000,
+                    labels: {
+                        formatter: function () {
+                            return Highcharts.dateFormat('%m-%d', this.value);
+                        },
+                        rotation: -30
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.key}</b><br>',
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> 数量: {point.y} ',
+                    xDateFormat: '%Y-%m-%d',
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#666666',
+                        lineWidth: 1,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: '#666666'
+                        }
+                    }
+                },
+                series: [
+                    {
+                    name: '问题新增趋势',
+                    data: []
+                    },
+                    {
+                    name: '问题回复更新趋势',
+                    data: []
+                    }
+                ]
+            };
+        $.ajax({
+        url: '',
+        type: 'POST',
+        success: function(res) {
+            // 请求成功时执行的操作
+            console.log('Data received:', res);
+            for (let i = 0; i < (res.data).length; i++) {
+                config.series[i].data = res.data[i];
+            }
+            var chart = Highcharts.chart('container', config);
+        },
+        error: function(xhr, status, error) {
+            // 请求失败时执行的操作
+            console.error('Error:', error);
+            // 在这里处理错误情况
+        }
+    });
+    }
+</script>
 
 {% endblock %}

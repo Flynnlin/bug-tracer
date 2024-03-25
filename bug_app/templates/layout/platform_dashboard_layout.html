@@ -48,7 +48,7 @@
                             <a class="nav-link" href="{% url 'project_wiki' request.tracer.project.id %}">wiki</a>
                     </li>
                     <li class="nav-item">
-                            <a class="nav-link" href="">统计</a>
+                            <a class="nav-link" href="{% url 'project_statistics' request.tracer.project.id %}">统计</a>
                     </li>
                     <li class="nav-item">
                             <a class="nav-link" href="{% url 'project_settings' request.tracer.project.id %}">设置</a>

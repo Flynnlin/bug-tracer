@@ -1,8 +1,14 @@
+import collections
+import datetime
+import time
+
+from django.db.models import Count
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 
 from bug_app.forms.project_form import ProjectModelform
-from bug_app.models import Project, ProjectUser, IssuesType
+from bug_app.models import Project, ProjectUser, IssuesType, Issues, IssuesReply, Transaction, PricePolicy
 from bug_app.utils import oss, uuidStr
 
 """
@@ -97,12 +103,71 @@ def project_star_view(request, project_type, project_id):
     else:
         return HttpResponse('错误')
 
-
 # 进入项目
+@csrf_exempt
 def project_dashboard_view(request, project_id):
     #当访问项目管理的url时，会触发中间件
-    #鉴权
-    #记录project信息到request中
-    return  render(request,'platform/project_dashboard.html')
+    #鉴权 、记录project信息到request中
+    if request.method == 'POST':
+        """ 在概览页面生成highcharts所需的数据 """
+        today = datetime.datetime.now().date()
+        # 初始化两个时间轴
+        date_dict = collections.OrderedDict()
+        date_dict2 = collections.OrderedDict()
+        for i in range(0, 30):
+            date = today - datetime.timedelta(days=i)
+            date_dict[date.strftime("%Y-%m-%d")] = [time.mktime(date.timetuple()) * 1000, 0]
+        for i in range(0, 30):
+            date = today - datetime.timedelta(days=i)
+            date_dict2[date.strftime("%Y-%m-%d")] = [time.mktime(date.timetuple()) * 1000, 0]
 
+        # 获取30天内的数据
+        Issuesresult = (Issues.objects.filter(project_id=project_id,
+                                      create_datetime__gte=today - datetime.timedelta(days=30))
+                    # 新增查询列 ctime，为截取创建时间的日期| # mysql 时间格式函数 "DATE_FORMAT(bug_app_issues.create_datetime,'%%Y-%%m-%%d')"
+                  .extra(select={'ctime': "strftime('%%Y-%%m-%%d',bug_app_issues.create_datetime)"})
+                  # 根据ctime将记录分组，计算数量，此时记录只剩下两个字段，时间、次数
+                  .values('ctime').annotate(ct=Count('id')))
+        Replyresult = (IssuesReply.objects.filter(issues__project_id=project_id,
+                                        create_datetime__gte=today - datetime.timedelta(days=30))
+                  .extra(select={'ctime': "strftime('%%Y-%%m-%%d',bug_app_issuesreply.create_datetime)"})
+                  .values('ctime')
+                  .annotate(ct=Count('id')))
+
+        for item in Issuesresult:
+            date_dict[item['ctime']][1] = item['ct']
+        d1 = list(date_dict.values())
+
+        for item in Replyresult:
+            date_dict2[item['ctime']][1] = item['ct']
+        d2 = list(date_dict2.values())
+
+        data = [d1,d2]
+        return JsonResponse({'status': True, 'data':data })
+
+    # 获取最大使用空间和已经使用容量 （0.0/10.0M）
+    max_transaction = Transaction.objects.filter(user=request.tracer.project.creator).order_by('-id').first()
+    if max_transaction.price_policy.category == 1:
+        pricePolicy = max_transaction.price_policy
+    else:
+        if max_transaction.end_datetime < datetime.datetime.now():
+            pricePolicy = PricePolicy.objects.filter(category=1).first()
+        else:
+            pricePolicy = max_transaction.price_policy
+    max_storage = round(pricePolicy.project_space / (1024 * 1024), 2)
+    storage = str(round(request.tracer.project.use_space/(1024 * 1024),2))+'/'+str(max_storage)+"M"
+    # 获取最新的几条问题更新记录
+    last_reply=IssuesReply.objects.filter(issues__project_id=project_id).order_by('-create_datetime')[:5]
+    # 获取参与人员
+    user_list=ProjectUser.objects.filter(project_id=project_id).order_by('-create_datetime')
+
+    # 问题数据处理 各种状态有多少多少个
+    status_dict = collections.OrderedDict()
+    for key, text in Issues.status_choices:
+        status_dict[key] = {'text': text, 'count': 0}
+    issues_data = Issues.objects.filter(project_id=project_id).values('status').annotate(ct=Count('id'))
+    for item in issues_data:
+        status_dict[item['status']]['count'] = item['ct']
+    print(status_dict)
+    return  render(request,'platform/project_dashboard.html',{'storage':storage,'last_reply':last_reply,'user_list':user_list,'status_dict':status_dict})
 
