@@ -27,7 +27,6 @@ def project_setting_delete(request,project_id):
         Emsg = "没有权限查看，请联系项目创建者"
         return render(request, 'platform/setting/project_setting_del.html',{'Emsg':Emsg})
     if request.method == 'POST':
-        print(request.POST)
         project = Project.objects.get(id=project_id)
         confirm_name = request.POST.get('confirm_name')
         if confirm_name and confirm_name == project.name:
@@ -60,6 +59,25 @@ def project_setting_edit(request,project_id):
 
     form = ProjectModelform(instance=project,request=request)
     return render(request,'platform/setting/project_setting_edit.html',{'form':form})
+
+@csrf_exempt
+def project_settings_exit(request,project_id):
+    project = Project.objects.get(id=project_id)
+    if request.tracer.user == request.tracer.project.creator:
+        Emsg = "项目创建者不能退出项目"
+        return render(request, 'platform/setting/project_setting_exit.html', {'Emsg': Emsg})
+    if request.method == 'POST':
+        confirm_name = request.POST.get('confirm_name')
+        if confirm_name and confirm_name == project.name:
+            # 删除ProjectUser记录
+            ProjectUser.objects.filter(project=project,user=request.tracer.user).delete()
+            # project 人数-1
+            project.join_count=project.join_count-1
+            project.save()
+            return JsonResponse({'status':True})
+        else:
+            return JsonResponse({'status':False,'msg':'你不想退出吧'})
+    return render(request, 'platform/setting/project_setting_exit.html')
 @csrf_exempt
 def project_invite_view(request,project_id):
 

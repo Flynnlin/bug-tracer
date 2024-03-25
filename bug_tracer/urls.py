@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from bug_app.views import userAccount_views, index_views, project_views, wiki_view, fileRepository_view, \
-    project_setting_view, issue_view
+    project_setting_view, issue_view,statistics_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -67,6 +67,7 @@ urlpatterns = [
         path('settings/del/', project_setting_view.project_setting_delete, name='project_settings_del'),
         path('settings/edit/', project_setting_view.project_setting_edit, name='project_settings_edit'),
         path('settings/invite/', project_setting_view.project_invite_view, name='project_invite'),
+        path('settings/exit/', project_setting_view.project_settings_exit, name='project_settings_exit'),
 
         path('issues/', include([
             path('', issue_view.issue_view, name='issue'),
@@ -75,7 +76,7 @@ urlpatterns = [
             path("<int:issue_id>/getReply/",issue_view.issue_get_reply_view, name='issue_get_reply'),
 
         ])),
-        # path('statistics/', project_views.project_statistics_view, name='project_statistics'),
+        path('statistics/', statistics_views.statistic_view, name='project_statistics'),
         ])
     ),
     path('mdeditor/', include(('mdeditor.urls', 'mdeditor'), namespace='mdeditor')), # 配置编辑器路由

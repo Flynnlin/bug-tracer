@@ -29,9 +29,9 @@
             </div>
             {#   右边         #}
             <div class="col-md-9">
-                <div class="card border-info">
-                    <div class="card-header bg-info text-dark" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div><a class="text-dark">项目信息</a></div>
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div><a class="text-dark">退出项目</a></div>
                     </div>
                     <div class="card-body">
                         {% if Emsg %}
@@ -39,8 +39,11 @@
                         {% else %}
                             <form action="" method="post">
                                 {% csrf_token %}
-                                    {{ form.as_p }}
-                                <button id ="updateBtn"  type="submit" class="btn btn-info text-dark">确认</button>
+                                <div class="mb-3">
+                                    <label for="confirmName" class="form-label">请输入当前的项目名确认退出：</label>
+                                    <input type="text" class="form-control" id="confirmName" name="confirm_name">
+                                </div>
+                                <button id ="deleteBtn"  type="button" class="btn btn-warning text-dark">确认</button>
                             </form>
                         {% endif %}
                     </div>
@@ -67,7 +70,7 @@
         $('#deleteBtn').click(function (){
             console.log($('#confirmName').val())
             $.ajax({
-                url:'{% url 'project_settings_del' request.tracer.project.id %}' , // 发送到的URL
+                url:'{% url 'project_settings_exit' request.tracer.project.id %}' , // 发送到的URL
                 type: 'POST', // 发送的请求类型为GET
                 dataType: 'json', // 预期返回的数据类型为JSON
                 data: {
@@ -75,7 +78,7 @@
 		            },
                 success: function (response){ // Ajax请求成功后的回调函数
                     if (response.status){ // 如果返回的状态为成功
-                        alert('删除成功');
+                        alert('退出成功');
                         window.location.href = "{% url 'project_list' %}";
                     } else { // 如果返回的状态为失败
                         alert(response.msg);

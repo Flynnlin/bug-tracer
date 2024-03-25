@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from bug_app.models import FileRepository, Project
+from bug_app.models import FileRepository, Project, Transaction, PricePolicy
 from bug_app.utils import oss, is_url
 
 
@@ -63,10 +63,19 @@ def fileRepository_upload_view(request,project_id):
     cloud=oss.ConnectOss()
     if file_type == '1':
         # 先判断是否余额充足
-        PricePolicy = request.tracer.price_policy
-        project_space = PricePolicy.project_space #单个桶的空间大小
-        per_file_size = PricePolicy.per_file_size #单个文件的大小
-        storage = Project.objects.get(id=project_id).use_space
+        max_transaction = Transaction.objects.filter(user=request.tracer.project.creator).order_by('-id').first()
+        if max_transaction.price_policy.category == 1:
+            pricePolicy = max_transaction.price_policy
+        else:
+            if max_transaction.end_datetime < datetime.datetime.now():
+                pricePolicy = PricePolicy.objects.filter(category=1).first()
+            else:
+                pricePolicy = max_transaction.price_policy
+
+
+        project_space = pricePolicy.project_space #单个桶的空间大小
+        per_file_size = pricePolicy.per_file_size #单个文件的大小
+        storage = Project.objects.get(id=project_id).use_space # 已使用大小
         if per_file_size<=file_size:
             data_dict['msg'] = '文件过大，请升级套餐'
             data_dict['status'] = False
