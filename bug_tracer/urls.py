@@ -76,6 +76,8 @@ urlpatterns = [
             path("<int:issue_id>/getReply/",issue_view.issue_get_reply_view, name='issue_get_reply'),
         ])),
         path('statistics/', statistics_views.statistic_view, name='project_statistics'),
+        path('statistics/api/getType', statistics_views.projectIssue_type_view,name='projectIssueType'),
+        path('statistics/api/getStatus', statistics_views.projectUser_work_view,name='projectUserWork'),
         ])
     ),
     path('mdeditor/', include(('mdeditor.urls', 'mdeditor'), namespace='mdeditor')), # 配置编辑器路由
