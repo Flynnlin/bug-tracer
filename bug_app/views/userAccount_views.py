@@ -1,17 +1,20 @@
 import base64
 import datetime
+import re
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django_redis import get_redis_connection
 
 from bug_app.forms.account_form import UserRegForm, UserLogin_SMS_Form, SendSmsForm, UserLogin_code_Form
-from bug_app.utils import captcha, uuidStr
+from bug_app.utils import captcha, uuidStr, encrypt
 from bug_app.models import Transaction, PricePolicy
 
 """
 用户账户  注册 登录 注销
 相关实现
+用户信息展示（基本信息和账单）
 """
 
 
@@ -135,3 +138,33 @@ def send_sms_view(request):
     else:
         msg['Error'] = phoneForm.errors
     return JsonResponse(msg)
+
+
+def user_info_view(request):
+    # 用户信息
+    # 账单
+    transaction = Transaction.objects.filter(user=request.tracer.user).order_by('-id')
+    return render(request,'account/my_info.html',{'transaction':transaction})
+
+
+def user_change_password_view(request):
+    if request.method == 'POST':
+        newPass=request.POST.get('newPass')
+        code = request.POST.get('code')
+        conn = get_redis_connection('default')
+        redis_code = conn.get('sms_code' + request.tracer.user.mobile_phone)
+        redis_code = redis_code.decode('utf-8')
+        if len(newPass) < 8:
+            return HttpResponse('密码不能小于8位')
+        # 检查密码是否包含字母、数字和特殊符号
+        if not re.search(r'[a-zA-Z]', newPass) or not re.search(r'\d', newPass) or not re.search(r'[\W_]', newPass):
+            return HttpResponse('密码必须包含字母、数字和特殊符号')
+        # 对密码进行加密
+        cypto_pass = encrypt.toMd5(newPass)
+        print(redis_code)
+        if code == redis_code: #验证通过
+            request.tracer.user.password = cypto_pass
+            request.tracer.user.save()
+            request.session.clear()
+            return redirect('/index/')
+        return HttpResponse('失败')

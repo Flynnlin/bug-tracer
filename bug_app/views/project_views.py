@@ -146,7 +146,7 @@ def project_dashboard_view(request, project_id):
         return JsonResponse({'status': True, 'data':data })
 
     # 获取最大使用空间和已经使用容量 （0.0/10.0M）
-    max_transaction = Transaction.objects.filter(user=request.tracer.project.creator).order_by('-id').first()
+    max_transaction = Transaction.objects.filter(user=request.tracer.project.creator,status=2).order_by('-id').first()
     if max_transaction.price_policy.category == 1:
         pricePolicy = max_transaction.price_policy
     else:

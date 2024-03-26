@@ -41,7 +41,13 @@
                 <tr>
                     <th>{% if f.file_type == 2 %}<a href="{% url 'project_file' request.tracer.project.id %}?folder_id={{ f.id }}">{{ f.name }}📂</a>{% else %}{{ f.name }}{% endif %}
                     </th>
-                    <td>{% if f.file_type == 1 %}{{ f.file_size}}字节{% endif %}</td>
+                    <td>{% if f.file_type == 1 %}
+                            {% if f.file_size > 1048576 %}
+                                {% widthratio f.file_size 1048576 1 %}MB
+                            {% else %}
+                                {% widthratio f.file_size 1024 1 %}KB
+                            {% endif %}
+                     {% endif %}</td>
                     <td>{{ f.update_user.username }}</td>
                     <td>{{ f.update_datetime }}</td>
                     <td>

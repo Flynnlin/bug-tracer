@@ -63,11 +63,11 @@ def fileRepository_upload_view(request,project_id):
     cloud=oss.ConnectOss()
     if file_type == '1':
         # 先判断是否余额充足
-        max_transaction = Transaction.objects.filter(user=request.tracer.project.creator).order_by('-id').first()
+        max_transaction = Transaction.objects.filter(user=request.tracer.project.creator,status=2).order_by('-id').first()
         if max_transaction.price_policy.category == 1:
             pricePolicy = max_transaction.price_policy
         else:
-            if max_transaction.end_datetime < datetime.datetime.now():
+            if max_transaction.end_datetime < datetime.now():
                 pricePolicy = PricePolicy.objects.filter(category=1).first()
             else:
                 pricePolicy = max_transaction.price_policy
