@@ -74,6 +74,7 @@ urlpatterns = [
         path('settings/edit/', project_setting_view.project_setting_edit, name='project_settings_edit'),
         path('settings/invite/', project_setting_view.project_invite_view, name='project_invite'),
         path('settings/exit/', project_setting_view.project_settings_exit, name='project_settings_exit'),
+        path('settings/custom/', project_setting_view.custom_project_view, name='project_settings_custom'),
 
         path('issues/', include([
             path('', issue_view.issue_view, name='issue'),

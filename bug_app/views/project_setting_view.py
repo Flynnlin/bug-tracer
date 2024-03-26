@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from bug_app.forms.invite_code_form import InviteForm
 from bug_app.forms.project_form import ProjectModelform
-from bug_app.models import Project, ProjectInvite, ProjectUser, Transaction, PricePolicy
+from bug_app.models import Project, ProjectInvite, ProjectUser, Transaction, PricePolicy, Module, IssuesType
 from bug_app.utils import oss
 from django.views.decorators.csrf import csrf_exempt
 
@@ -183,3 +183,17 @@ def invite_join(request, code):
         invite_object.project.save()
 
         return render(request, 'platform/invite_join.html', {'project': invite_object.project,'success': '已加入项目'})
+
+
+def custom_project_view(request,project_id):
+    if request.method == 'POST':
+        newmode = request.POST.get('module_name', None)
+        newTyep = request.POST.get('issue_type', None)
+        if newmode:
+            Module.objects.create(title=newmode, project=request.tracer.project)
+        if newTyep:
+            IssuesType.objects.create(title=newTyep, project=request.tracer.project)
+
+    model = Module.objects.filter(project_id=project_id)
+    issue_types = IssuesType.objects.filter(project_id=project_id)
+    return render(request,'platform/setting/project_custom.html',{'model':model,'issue_types':issue_types})

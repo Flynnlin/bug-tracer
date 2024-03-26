@@ -23,6 +23,7 @@
                 <div class="list-group" style="">
                     <a href="{% url 'project_settings_edit' request.tracer.project.id %}" class="list-group-item">项目信息</a>
                     <a href="{% url 'project_invite' request.tracer.project.id %}" class="list-group-item" >邀请进组</a>
+                    <a href="{% url 'project_settings_custom' request.tracer.project.id %}" class="list-group-item" >项目个性化</a>
                     <a href="{% url 'project_settings_del' request.tracer.project.id %}" class="list-group-item" style="background-color: #dc3545;color: white">删除项目</a>
                     <a href="{% url 'project_settings_exit' request.tracer.project.id %}" class="list-group-item" style="background-color: #dc3545;color: white">退出项目</a>
                 </div>

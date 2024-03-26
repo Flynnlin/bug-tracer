@@ -1,0 +1,101 @@
+{% extends 'layout/platform_dashboard_layout.html' %}
+
+{% block title %}
+    设置
+{% endblock %}
+
+{% block css %}
+    <script src="https://cdn.staticfile.net/clipboard.js/2.0.4/clipboard.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="card project">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div><a>⚙️设置</a>
+            </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {#   左边         #}
+            <div class="  col-md-3">
+                <div class="list-group" style="">
+                    <a href="{% url 'project_settings_edit' request.tracer.project.id %}" class="list-group-item">项目信息</a>
+                    <a href="{% url 'project_invite' request.tracer.project.id %}" class="list-group-item" >邀请进组</a>
+                    <a href="{% url 'project_settings_custom' request.tracer.project.id %}" class="list-group-item" >项目个性化</a>
+                    <a href="{% url 'project_settings_del' request.tracer.project.id %}" class="list-group-item" style="background-color: #dc3545;color: white">删除项目</a>
+                    <a href="{% url 'project_settings_exit' request.tracer.project.id %}" class="list-group-item" style="background-color: #dc3545;color: white">退出项目</a>
+
+                </div>
+            </div>
+            {#   右边         #}
+            <div class=" col-md-9">
+                <div class="card project">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>个性化</a>
+                    </div></div>
+                    <div class="card-body">
+                        {% if Emsg %}
+                            <h1>{{ Emsg }}</h1>
+                        {% else %}
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <input type="text" name="issue_type" placeholder="问题类型" style="width: 200px">
+                                <button   class="btn-primary" type="submit">生成</button>
+                            </form>
+                            <br>
+                            <form method="post" action="{% url 'project_settings_custom' request.tracer.project.id %}">
+                                {% csrf_token %}
+                                <input type="text" name="module_name" placeholder="项目进度里程碑" style="width: 200px">
+                                <button   class="btn-primary" type="submit">生成</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="  col-md-6">
+                        <div class="card project">
+                            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>已经存在的问题类型
+                            </div></div>
+                            <div class="card-body">
+                                {% for item in issue_types %}
+                                <span class="type" style="display: inline-block; padding: 5px; background-color: white; color: black; border: 1px solid black;">
+                                            {{ item }}
+                                        </span>
+
+                                {% endfor %}
+                            </div>
+                    </div>
+                    </div>
+                    <div class="  col-md-6">
+                        <div class="card project">
+                            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>已经存在的里程碑
+                            </div></div>
+                            <div class="card-body">
+                                {% for item in model %}
+                                <span class="type" style="display: inline-block; padding: 5px; background-color: white; color: black; border: 1px solid black;">
+                                            {{ item }}
+                                        </span>
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+{#    下面 输出列表   #}
+            <div class="  col-md-3"></div>
+            <div class=" col-md-9">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block JavaScript %}
+
+
+{% endblock %}

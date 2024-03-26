@@ -58,8 +58,8 @@ def pay_view(request):
         # 初始化支付宝操作
         alipay = AliPay(
             appid=settings.ALIPAY_APPID,
-            app_notify_url="http://localhost:8000/user/pay/notify/",  # 公网IP 支付成功后 支付宝会向这个url post数据
-            return_url="http://localhost:8000/user/pay/notify/", #get请求 支付成功后跳转页面
+            app_notify_url=settings.PAY_TEST_URL+"/user/pay/notify/",  # 公网IP 支付成功后 支付宝会向这个url post数据
+            return_url=settings.PAY_TEST_URL+"/user/pay/notify/", #get请求 支付成功后跳转页面
             app_private_key_path=settings.APP_PRIVATE_KEY_PATH,
             alipay_public_key_path=settings.ALIPAY_PUBLIC_KEY_PATH,
         )

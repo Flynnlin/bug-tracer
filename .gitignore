@@ -17,3 +17,4 @@ media/
 
 #证书私钥
 *.pem
+/key_pem/

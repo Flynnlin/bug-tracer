@@ -38,11 +38,11 @@ def send_sms(code,number):
     request.add_query_param('TemplateCode', TemplateCode)  # 模板编号
     request.add_query_param('TemplateParam', f"{template}")  # 发送验证码内容
     #生产环境
-    # response = client.do_action_with_exception(request)
-    # res=str(response, encoding='utf-8')
+    response = client.do_action_with_exception(request)
+    res=str(response, encoding='utf-8')
 
     #测试环境
-    res ='OK'
+    # res ='OK'
     print(res + code)
 
     if 'OK' in res:
