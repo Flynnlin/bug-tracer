@@ -1,5 +1,64 @@
 {% extends 'layout/index_layout.html' %}
 {% load static %}
 {% block title %}
-    Tracer平台 - 价格
+    Tracer平台 - 价格套餐
+{% endblock %}
+
+{% block css %}
+    <style>
+        .package-panel {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .package-panel h3 {
+            margin-top: 0;
+        }
+        .package-panel ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .package-panel li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="padding: 10px">
+        <h2>价格套餐</h2>
+        <div class="row">
+            {% for p in policys %}
+            <div class="col-md-4">
+                <div class="package-panel">
+                    <h3>{{ p.get_category_display }}</h3>
+                    <ul>
+                        <li>{{ p.title }}</li>
+                        <li>价格: {{ p.price }}￥/年</li>
+                        <li>创建项目个数: {{ p.project_num }}个</li>
+                        <li>单个项目成员: {{ p.project_member }}个</li>
+                        <li>单个项目空间: {% widthratio p.project_space 1048576 1 %}MB</li>
+                        <li>单文件大小: {% widthratio p.per_file_size 1048576 1 %}MB</li>
+                    </ul>
+                    {% if "免费版" == p.get_category_display  %}
+                        <span class="input-group-text" style="text-align: center">永久免费</span>
+                    {% else %}
+                        <form action="{% url 'payment_view' %}" method="post">
+                        <div class="input-group">
+                            <span class="input-group-text">数量</span>
+                                {% csrf_token %}
+                                <input type="number" name="quantity"  class="form-control" min="1" value="1">
+                                <input type="hidden" name="policy_id" value="{{ p.id }}">
+                                <div class="input-group-append">
+                                    <button class="btn" type="submit">🛒</button>
+                                </div>
+                        </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'layout/platform_layout.html' %}
+{% block title %}账单{% endblock %}
+{% block css  %}
+    <style>
+        .container_b {
+            background-color: #f8f9fa;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 {
+            color: #dc3545;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        h5, h1 {
+            display: inline;
+            padding: 3px;
+    }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="container_b">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                {% if not error %}
+                    <a style="font-size: 60px">🛒</a> <br>
+                    <h5>你正在购买</h5><h1>{{ price_policy.title }}</h1><h5>套餐</h5>
+                    <br><br>
+                    <p>总金额：{{ Amount }}</p>
+                    <p>数量：{{ count }} 年</p>
+                    <a class="button" type="submit" href="{% url 'pay_view' %}">立即支付</a><br>
+                    <h5> 30分钟 内有效</h5>
+                    <hr>
+                        <li>价格: {{ price_policy.price }}￥/年</li>
+                        <li>创建项目个数: {{ price_policy.project_num }}个</li>
+                        <li>单个项目成员: {{ price_policy.project_member }}个</li>
+                        <li>单个项目空间: {% widthratio price_policy.project_space 1048576 1 %}MB</li>
+                        <li>单文件大小: {% widthratio price_policy.per_file_size 1048576 1 %}MB</li>
+                {% else %}
+                    <a style="font-size: 60px">❌</a> <br>
+                    <h1>{{ error }}</h1>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block JavaScript %}
+
+{% endblock %}
+
+
+
+
+
+
+

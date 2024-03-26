@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from bug_app.views import userAccount_views, index_views, project_views, wiki_view, fileRepository_view, \
-    project_setting_view, issue_view,statistics_views
+    project_setting_view, issue_view, statistics_views, pay_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,9 +29,13 @@ urlpatterns = [
     path('index/',index_views.index_view,name='index'),
     path('index/doc/',index_views.index_doc_view,name='index_doc'),
     path('index/function/',index_views.index_function_view,name='index_function'),
-    path('index/price/',index_views.index_price_view,name='index_price'),
+    path('index/price/',pay_view.show_pay_view,name='index_price'),
     path('index/scheme/',index_views.index_scheme_view,name='index_scheme'),
 
+    # 支付页面
+    path('user/payment/', pay_view.payment_view, name='payment_view'),
+    path('user/pay/', pay_view.pay_view, name='pay_view'),
+    path('user/pay/notify/', pay_view.pay_notify_view, name='pay_notify_view'),
     # 用户账户
     path('user/reg/', userAccount_views.user_register_view, name='user_register'),
     path('user/login/sms/', userAccount_views.user_SMSlogin_view, name='user_login_sms'),
@@ -40,6 +44,8 @@ urlpatterns = [
     path('send/sms/', userAccount_views.send_sms_view, name='sms_code'),
     path('send/logincode/', userAccount_views.img_code_view, name='send_img_code'),
     path('user/timeout/', userAccount_views.login_timeout_view, name='login_timeout'),
+    path('user/info/', userAccount_views.user_info_view, name='user_info'),
+    path('user/changePass/', userAccount_views.user_change_password_view,name='user_change_password_view'),
 
     #系统页面
     path('project/list/', project_views.project_list_view, name='project_list'),

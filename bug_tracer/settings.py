@@ -195,8 +195,11 @@ OSS_ACCESS_KEY_ID = "xxx"
 OSS_ACCESS_KEY_SECRET = "xxx"
 OSS_ENDPOINT = "xxx"    #就是区域
 
-
-
+# 支付宝沙箱环境 应用公钥、私钥、支付宝公钥
+APP_PRIVATE_KEY_PATH = os.path.join(BASE_DIR,'key_pem/APP_PRI.pem')
+ALIPAY_PUBLIC_KEY_PATH = os.path.join(BASE_DIR,'key_pem/ALIPAY_PUB.pem')
+ALIPAY_GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do"
+APP_ID=''
 
 # 导入本地配置信息 同目录下local_settings.py
 try:
