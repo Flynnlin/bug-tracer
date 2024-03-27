@@ -26,7 +26,7 @@ class IssuesForm(BootstrapModelForm):
         #2.父问题必须是本项目的
         self.fields['parent'].queryset = Issues.objects.filter(project=self.request.tracer.project)
         #3 .项目进度也是当前项目的
-        self.fields['mode'].queryset = Module.objects.filter(project=self.request.tracer.project)
+        self.fields['module'].queryset = Module.objects.filter(project=self.request.tracer.project)
         #4 .项目类型也是当前项目的
         self.fields['issues_type'].queryset = IssuesType.objects.filter(project=self.request.tracer.project)
 

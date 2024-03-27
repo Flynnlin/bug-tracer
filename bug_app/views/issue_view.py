@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from bug_app.forms.issues_form import IssuesForm, IssuesReplyModelForm
-from bug_app.models import Issues, IssuesReply, ProjectUser, IssuesType
+from bug_app.models import Issues, IssuesReply, ProjectUser, IssuesType, Module
 from bug_app.utils.pagination import Pagination
 from bug_app.utils.filter_yield import CheckFilter,SelectFilter,dateFilter
 
